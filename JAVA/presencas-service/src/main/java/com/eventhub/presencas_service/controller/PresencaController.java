@@ -28,7 +28,18 @@ public class PresencaController {
     }
 
     @PostMapping
-    public Presenca registrar(@RequestBody Presenca presenca) {
-        return presencaRepository.save(presenca);
+    public ResponseEntity<?> registrar(@RequestBody Presenca presenca) {
+        // Validação: Usuário já fez check-in neste evento?
+        boolean jaExiste = presencaRepository.existsByUsuarioIdAndEventoId(
+                presenca.getUsuarioId(), 
+                presenca.getEventoId()
+        );
+
+        if (jaExiste) {
+            return ResponseEntity.badRequest().body("Usuário já realizou check-in neste evento!");
+        }
+
+        Presenca nova = presencaRepository.save(presenca);
+        return ResponseEntity.ok(nova);
     }
 }

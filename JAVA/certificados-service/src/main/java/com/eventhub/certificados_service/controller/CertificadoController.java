@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/certificados")
@@ -15,7 +17,6 @@ public class CertificadoController {
     @Autowired
     private CertificadoRepository certificadoRepository;
 
-    // 1. Consultar certificado por ID
     @GetMapping("/{id}")
     public ResponseEntity<Certificado> buscarPorId(@PathVariable Long id) {
         return certificadoRepository.findById(id)
@@ -23,19 +24,35 @@ public class CertificadoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 2. Emitir novo certificado
     @PostMapping
-    public Certificado emitir(@RequestBody Certificado certificado) {
+    public ResponseEntity<?> emitir(@RequestBody Certificado certificado) {
+        // 1. Verifica duplicidade
+        boolean jaEmitido = certificadoRepository.existsByUsuarioIdAndEventoId(
+                certificado.getUsuarioId(), 
+                certificado.getEventoId()
+        );
+
+        if (jaEmitido) {
+            return ResponseEntity.badRequest().body("Certificado já emitido para este evento!");
+        }
+
+        // 2. Gera dados do certificado
         certificado.setCodigoAutenticacao(UUID.randomUUID().toString());
-        certificado.setDataEmissao(java.time.LocalDateTime.now());
-        return certificadoRepository.save(certificado);
+        certificado.setDataEmissao(LocalDateTime.now());
+        
+        Certificado novo = certificadoRepository.save(certificado);
+        return ResponseEntity.ok(novo);
     }
 
-    // 3. Validar certificado
+    // Valida se um código UUID é real
     @GetMapping("/validar/{codigo}")
     public ResponseEntity<?> validar(@PathVariable String codigo) {
-        return certificadoRepository.findByCodigoAutenticacao(codigo)
-                .map(cert -> ResponseEntity.ok("Certificado válido."))
-                .orElse(ResponseEntity.status(404).body("Certificado inválido."));
+        Optional<Certificado> cert = certificadoRepository.findByCodigoAutenticacao(codigo);
+
+        if (cert.isPresent()) {
+            return ResponseEntity.ok(cert.get()); // Retorna os dados para mostrar na tela
+        } else {
+            return ResponseEntity.status(404).body("Certificado inválido ou inexistente.");
+        }
     }
 }

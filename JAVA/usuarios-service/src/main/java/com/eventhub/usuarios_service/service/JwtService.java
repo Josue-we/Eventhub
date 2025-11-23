@@ -14,7 +14,6 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // A chave deve ser a mesma para gerar e para ler
     private static final String SECRET = "MEGA_CHAVE_SECRETA_EVENT_HUB_2025_SUPER_SEGURA";
 
     // Método auxiliar para gerar a chave criptográfica
@@ -23,7 +22,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 1. Gerar Token (O que tu já tinhas, levemente ajustado)
+    // 1. Gerar Token
     public String gerarToken(Usuario usuario) {
         return Jwts.builder()
                 .subject(usuario.getEmail())
@@ -34,7 +33,7 @@ public class JwtService {
                 .compact();
     }
 
-    // 2. Extrair o Email (Subject) do Token - O método que faltava!
+    // 2. Extrair o Email (Subject) do Token
     public String extrairEmail(String token) {
         return extrairClaim(token, Claims::getSubject);
     }
@@ -54,7 +53,7 @@ public class JwtService {
                 .getPayload();
     }
     
-    // 5. Validar se o token é válido (opcional, mas recomendado para o filtro)
+    // 5. Validar se o token é válido
     public boolean isTokenValido(String token, String emailUsuario) {
         final String emailNoToken = extrairEmail(token);
         return (emailNoToken.equals(emailUsuario) && !isTokenExpirado(token));

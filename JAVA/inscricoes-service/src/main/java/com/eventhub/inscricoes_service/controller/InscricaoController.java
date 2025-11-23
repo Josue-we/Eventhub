@@ -16,26 +16,41 @@ public class InscricaoController {
     @Autowired
     private InscricaoRepository inscricaoRepository;
 
-    // 1. Consultar todas as inscrições
     @GetMapping
     public List<Inscricao> listar() {
         return inscricaoRepository.findAll();
     }
 
-    // 2. Consultar por ID
+    // Busca as inscrições de um usuário específico (útil para "Minhas Inscrições")
+    @GetMapping("/usuario/{usuarioId}")
+    public List<Inscricao> listarPorUsuario(@PathVariable Long usuarioId) {
+        return inscricaoRepository.findByUsuarioId(usuarioId);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Inscricao> buscarPorId(@PathVariable Long id) {
         Optional<Inscricao> i = inscricaoRepository.findById(id);
         return i.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // 3. Criar nova inscrição
     @PostMapping
-    public Inscricao criar(@RequestBody Inscricao inscricao) {
-        return inscricaoRepository.save(inscricao);
+    public ResponseEntity<?> criar(@RequestBody Inscricao inscricao) {
+        // Validação: Verificar se já existe inscrição ATIVA para este User + Evento
+        Optional<Inscricao> existente = inscricaoRepository.findByUsuarioIdAndEventoId(
+                inscricao.getUsuarioId(), 
+                inscricao.getEventoId()
+        );
+
+        if (existente.isPresent() && "ATIVA".equals(existente.get().getStatus())) {
+            return ResponseEntity.badRequest().body("Usuário já inscrito neste evento!");
+        }
+
+        // Se não existe ou estava cancelada, salva a nova
+        inscricao.setStatus("ATIVA"); // Garante status inicial
+        Inscricao nova = inscricaoRepository.save(inscricao);
+        return ResponseEntity.ok(nova);
     }
 
-    // 4. Cancelar inscrição
     @DeleteMapping("/{id}")
     public ResponseEntity<String> cancelar(@PathVariable Long id) {
         Optional<Inscricao> opt = inscricaoRepository.findById(id);
