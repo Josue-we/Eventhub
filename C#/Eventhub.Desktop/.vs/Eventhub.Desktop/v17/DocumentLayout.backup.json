@@ -1,0 +1,138 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\presencaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\presencaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\inscricaoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\inscricaoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\frmprincipal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\frmprincipal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\frmprincipal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\frmprincipal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\frmprincipal.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\frmprincipal.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\sessao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\sessao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PresencaService.cs",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\PresencaService.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\PresencaService.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\PresencaService.cs",
+              "RelativeToolTip": "Eventhub.Desktop\\PresencaService.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA0AAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-25T01:15:26.098Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "InscricaoService.cs",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\InscricaoService.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\InscricaoService.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\InscricaoService.cs",
+              "RelativeToolTip": "Eventhub.Desktop\\InscricaoService.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-25T00:44:24.291Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "FrmPrincipal.cs",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmPrincipal.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\FrmPrincipal.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmPrincipal.cs",
+              "RelativeToolTip": "Eventhub.Desktop\\FrmPrincipal.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAuwIsAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-25T00:43:38.648Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FrmPrincipal.cs [Design]",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmPrincipal.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\FrmPrincipal.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmPrincipal.cs [Design]",
+              "RelativeToolTip": "Eventhub.Desktop\\FrmPrincipal.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-25T00:41:39.235Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "FrmPrincipal.Designer.cs",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmPrincipal.Designer.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\FrmPrincipal.Designer.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmPrincipal.Designer.cs",
+              "RelativeToolTip": "Eventhub.Desktop\\FrmPrincipal.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-25T00:41:31.289Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Sessao.cs",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\Sessao.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\Sessao.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\Sessao.cs",
+              "RelativeToolTip": "Eventhub.Desktop\\Sessao.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-25T00:36:43.375Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\AuthService.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\AuthService.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\AuthService.cs",
+              "RelativeToolTip": "Eventhub.Desktop\\AuthService.cs",
+              "ViewState": "AgIAAEUAAAAAAAAAAAAAAFoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-23T17:08:11.158Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
