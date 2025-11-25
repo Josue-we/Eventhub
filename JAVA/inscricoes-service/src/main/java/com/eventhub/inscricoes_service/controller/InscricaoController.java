@@ -35,7 +35,7 @@ public class InscricaoController {
 
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Inscricao inscricao) {
-        // Validação: Verificar se já existe inscrição ATIVA para este User + Evento
+        // verifica se já existe inscrição ATIVA
         Optional<Inscricao> existente = inscricaoRepository.findByUsuarioIdAndEventoId(
                 inscricao.getUsuarioId(), 
                 inscricao.getEventoId()
@@ -45,8 +45,7 @@ public class InscricaoController {
             return ResponseEntity.badRequest().body("Usuário já inscrito neste evento!");
         }
 
-        // Se não existe ou estava cancelada, salva a nova
-        inscricao.setStatus("ATIVA"); // Garante status inicial
+        inscricao.setStatus("ATIVA");
         Inscricao nova = inscricaoRepository.save(inscricao);
         return ResponseEntity.ok(nova);
     }
