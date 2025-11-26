@@ -237,5 +237,53 @@ namespace Eventhub.Desktop
 
             MessageBox.Show($"Sincronização concluída!\n\nInscrições enviadas: {sucessoInscricoes}\nPresenças enviadas: {sucessoPresencas}");
         }
+
+        private async void btnCertificado_Click(object sender, EventArgs e)
+        {
+            // 1. Validação padrão
+            if (dataGridView1.SelectedRows.Count == 0 && dataGridView1.CurrentRow == null)
+            {
+                MessageBox.Show("Selecione o evento para emitir o certificado.");
+                return;
+            }
+
+            try
+            {
+                var linha = dataGridView1.CurrentRow;
+                var eventoSelecionado = (Evento)linha.DataBoundItem;
+
+                // 2. Chama o serviço
+                CertificadoService service = new CertificadoService();
+                string resultado = await service.EmitirCertificado(Sessao.UsuarioId, eventoSelecionado.Id);
+
+                // 3. Verifica o resultado
+                if (resultado.StartsWith("ERRO") || resultado.Contains("Erro"))
+                {
+                    // Mostra o erro exato que veio do servidor
+                    MessageBox.Show("O servidor respondeu:\n" + resultado, "Erro Detalhado", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    // SUCESSO! Mostra o UUID e copia para a área de transferência
+                    Clipboard.SetText(resultado); // Copia o código para o Ctrl+V
+
+                    MessageBox.Show(
+                        $"Certificado emitido com sucesso!\n\nCódigo de Validação:\n{resultado}\n\n(O código foi copiado para sua área de transferência)",
+                        "Certificado Gerado",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro técnico: " + ex.Message);
+            }
+        }
+
+        private void btnMinhasInscricoes_Click(object sender, EventArgs e)
+        {
+            FrmMinhasInscricoes tela = new FrmMinhasInscricoes();
+            tela.ShowDialog(); // Abre como pop-up
+        }
     }
 }

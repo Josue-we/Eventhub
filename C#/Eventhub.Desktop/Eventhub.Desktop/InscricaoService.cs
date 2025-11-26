@@ -50,5 +50,49 @@ namespace Eventhub.Desktop
                 }
             }
         }
+        // Método para listar inscrições do usuário logado
+        public async Task<System.Data.DataTable> ListarMinhasInscricoes(long usuarioId)
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", Sessao.Token);
+
+            try
+            {
+                // GET /inscricoes/usuario/{id}
+                // Nota: Se estiveres sem túnel, usa o IP direto aqui!
+                string url = $"http://177.44.248.77:8084/inscricoes/usuario/{usuarioId}";
+
+                var response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    // Convertemos para DataTable para facilitar a exibição no Grid
+                    return JsonConvert.DeserializeObject<System.Data.DataTable>(json);
+                }
+            }
+            catch { }
+
+            return null;
+        }
+
+        // Método para Cancelar
+        public async Task<bool> CancelarInscricao(long inscricaoId)
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", Sessao.Token);
+
+            try
+            {
+                // DELETE /inscricoes/{id}
+                string url = $"http://177.44.248.77:8084/inscricoes/{inscricaoId}";
+                var response = await client.DeleteAsync(url);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

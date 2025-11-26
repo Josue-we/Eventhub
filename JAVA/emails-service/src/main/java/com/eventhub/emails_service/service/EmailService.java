@@ -16,6 +16,7 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(request.getTo());
+        message.setFrom("eventhub@noreply.com");
         message.setSubject(request.getSubject());
         message.setText(request.getBody());
 

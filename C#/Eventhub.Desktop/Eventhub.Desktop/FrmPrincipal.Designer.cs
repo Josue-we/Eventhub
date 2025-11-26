@@ -34,6 +34,8 @@
             btnInscrever = new Button();
             btnCheckin = new Button();
             btnSync = new Button();
+            btnCertificado = new Button();
+            btnMinhasInscricoes = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -70,7 +72,7 @@
             // 
             // btnInscrever
             // 
-            btnInscrever.Location = new Point(12, 409);
+            btnInscrever.Location = new Point(12, 374);
             btnInscrever.Name = "btnInscrever";
             btnInscrever.Size = new Size(203, 29);
             btnInscrever.TabIndex = 3;
@@ -99,11 +101,33 @@
             btnSync.UseVisualStyleBackColor = true;
             btnSync.Click += btnSync_Click;
             // 
+            // btnCertificado
+            // 
+            btnCertificado.Location = new Point(455, 409);
+            btnCertificado.Name = "btnCertificado";
+            btnCertificado.Size = new Size(133, 29);
+            btnCertificado.TabIndex = 6;
+            btnCertificado.Text = "Emitir Certificado";
+            btnCertificado.UseVisualStyleBackColor = true;
+            btnCertificado.Click += btnCertificado_Click;
+            // 
+            // btnMinhasInscricoes
+            // 
+            btnMinhasInscricoes.Location = new Point(12, 409);
+            btnMinhasInscricoes.Name = "btnMinhasInscricoes";
+            btnMinhasInscricoes.Size = new Size(159, 29);
+            btnMinhasInscricoes.TabIndex = 7;
+            btnMinhasInscricoes.Text = "Ver Minhas Inscrições";
+            btnMinhasInscricoes.UseVisualStyleBackColor = true;
+            btnMinhasInscricoes.Click += btnMinhasInscricoes_Click;
+            // 
             // FrmPrincipal
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnMinhasInscricoes);
+            Controls.Add(btnCertificado);
             Controls.Add(btnSync);
             Controls.Add(btnCheckin);
             Controls.Add(btnInscrever);
@@ -126,5 +150,7 @@
         private Button btnInscrever;
         private Button btnCheckin;
         private Button btnSync;
+        private Button btnCertificado;
+        private Button btnMinhasInscricoes;
     }
 }

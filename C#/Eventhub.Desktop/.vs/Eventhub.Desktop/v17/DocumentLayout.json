@@ -7,20 +7,24 @@
       "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\frmprincipal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\frmsenha.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\frmsenha.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\eventhub.desktop\\frmprincipal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\frmprincipal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\eventhub.desktop\\frmsenha.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\frmsenha.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\frmminhasinscricoes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\frmminhasinscricoes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\frmsenha.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\frmsenha.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\frmminhasinscricoes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\frmminhasinscricoes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\localdbservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\localdbservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\inscricaoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\inscricaoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|d:\\sistema de eventos\\eventhub\\c#\\eventhub.desktop\\eventhub.desktop\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4AC0ACA9-307E-4989-89A6-D391CBEAF8DF}|Eventhub.Desktop\\Eventhub.Desktop.csproj|solutionrelative:eventhub.desktop\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,45 +34,68 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "FrmSenha.Designer.cs",
-              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmSenha.Designer.cs",
-              "RelativeDocumentMoniker": "Eventhub.Desktop\\FrmSenha.Designer.cs",
-              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmSenha.Designer.cs",
-              "RelativeToolTip": "Eventhub.Desktop\\FrmSenha.Designer.cs",
-              "ViewState": "AgIAACsAAAAAAAAAAAAAwD0AAAA1AAAAAAAAAA==",
+              "Title": "FrmMinhasInscricoes.cs",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmMinhasInscricoes.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\FrmMinhasInscricoes.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmMinhasInscricoes.cs",
+              "RelativeToolTip": "Eventhub.Desktop\\FrmMinhasInscricoes.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAkwDAAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-26T01:46:18.553Z",
+              "WhenOpened": "2025-11-26T02:46:47.099Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "FrmSenha.cs [Design]",
-              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmSenha.cs",
-              "RelativeDocumentMoniker": "Eventhub.Desktop\\FrmSenha.cs",
-              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmSenha.cs [Design]",
-              "RelativeToolTip": "Eventhub.Desktop\\FrmSenha.cs [Design]",
+              "Title": "FrmMinhasInscricoes.cs [Design]",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmMinhasInscricoes.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\FrmMinhasInscricoes.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmMinhasInscricoes.cs [Design]",
+              "RelativeToolTip": "Eventhub.Desktop\\FrmMinhasInscricoes.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-26T01:41:00.57Z",
+              "WhenOpened": "2025-11-26T02:44:31.593Z",
               "EditorCaption": " [Design]"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "FrmSenha.cs",
-              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmSenha.cs",
-              "RelativeDocumentMoniker": "Eventhub.Desktop\\FrmSenha.cs",
-              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmSenha.cs",
-              "RelativeToolTip": "Eventhub.Desktop\\FrmSenha.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAJAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "InscricaoService.cs",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\InscricaoService.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\InscricaoService.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\InscricaoService.cs",
+              "RelativeToolTip": "Eventhub.Desktop\\InscricaoService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAF8AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-26T01:41:14.12Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-26T02:41:35.126Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\AuthService.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\AuthService.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\AuthService.cs",
+              "RelativeToolTip": "Eventhub.Desktop\\AuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-26T02:30:54.056Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "FrmPrincipal.cs [Design]",
+              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmPrincipal.cs",
+              "RelativeDocumentMoniker": "Eventhub.Desktop\\FrmPrincipal.cs",
+              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmPrincipal.cs [Design]",
+              "RelativeToolTip": "Eventhub.Desktop\\FrmPrincipal.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-26T02:24:52.458Z",
+              "EditorCaption": " [Design]"
             },
             {
               "$type": "Document",
@@ -78,22 +105,10 @@
               "RelativeDocumentMoniker": "Eventhub.Desktop\\FrmPrincipal.cs",
               "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\FrmPrincipal.cs",
               "RelativeToolTip": "Eventhub.Desktop\\FrmPrincipal.cs",
-              "ViewState": "AgIAAA0AAAAAAAAAAAAYwCIAAAANAAAAAAAAAA==",
+              "ViewState": "AgIAACIAAAAAAAAAAAAAACwAAAA8AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-25T02:20:10.816Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "LocalDbService.cs",
-              "DocumentMoniker": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\LocalDbService.cs",
-              "RelativeDocumentMoniker": "Eventhub.Desktop\\LocalDbService.cs",
-              "ToolTip": "D:\\Sistema de eventos\\Eventhub\\C#\\Eventhub.Desktop\\Eventhub.Desktop\\LocalDbService.cs",
-              "RelativeToolTip": "Eventhub.Desktop\\LocalDbService.cs",
-              "ViewState": "AgIAAMYAAAAAAAAAAAAAANAAAAAvAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-25T02:09:50.385Z"
             }
           ]
         }
