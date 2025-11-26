@@ -12,6 +12,7 @@ namespace Eventhub.Desktop
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             Application.Run(new Form1());
+            SQLitePCL.Batteries.Init();
         }
     }
 }

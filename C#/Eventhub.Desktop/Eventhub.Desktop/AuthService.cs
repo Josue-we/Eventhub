@@ -14,49 +14,66 @@ namespace Eventhub.Desktop
 
         public async Task<string> Login(string email, string senha)
         {
-            // 1. Cria o objeto com os dados
-            var loginData = new
-            {
-                email = email,
-                senha = senha
-            };
-
-            // 2. Transforma em JSON
-            var json = JsonConvert.SerializeObject(loginData);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+            // TENTATIVA 1: ONLINE (Via API)
             try
             {
-                // 3. Envia para a VM (via Túnel)
+                var loginData = new { email = email, senha = senha };
+                var json = JsonConvert.SerializeObject(loginData);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                //tenta conectar na VM
                 var response = await client.PostAsync(BASE_URL, content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // 4. Lê a resposta (Token)
                     var responseString = await response.Content.ReadAsStringAsync();
                     dynamic dados = JsonConvert.DeserializeObject(responseString);
-
                     string token = dados.token;
-
-                    // 5. Extrai o ID que está escondido dentro do Token
                     long idUsuario = ExtrairIdDoToken(token);
 
-                    // 6. Guarda TUDO na Sessão Global (para usar na Inscrição depois)
+                    // SUCESSO ONLINE:
+                    // 1. Configura a Sessão
                     Sessao.Token = token;
                     Sessao.EmailUsuario = email;
                     Sessao.UsuarioId = idUsuario;
 
+                    // 2. Salva no Banco Local
+                    try
+                    {
+                        LocalDbService db = new LocalDbService();
+                        db.SalvarUsuarioLocal(idUsuario, email, senha);
+                    }
+                    catch { /* Ignora erro de banco local para não travar o login */ }
+
                     return token;
                 }
-                else
+            }
+            catch (Exception)
+            {
+                // Se deu erro de conexão (Timeout, Sem internet, etc), cai aqui.
+                // Não fazemos nada aqui, deixamos seguir para a TENTATIVA 2.
+            }
+
+            // TENTATIVA 2: OFFLINE (Banco Local)
+            try
+            {
+                LocalDbService db = new LocalDbService();
+                long idLocal = db.AutenticarUsuarioLocal(email, senha);
+
+                if (idLocal > 0)
                 {
-                    return null; // Login falhou
+                    // SUCESSO OFFLINE:
+                    Sessao.Token = "TOKEN_OFFLINE"; // Token falso só para não ficar null
+                    Sessao.EmailUsuario = email;
+                    Sessao.UsuarioId = idLocal;
+
+                    return "OFFLINE"; // Retorna algo diferente de null
                 }
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Erro ao conectar na VM: " + ex.Message);
-            }
+            catch { }
+
+            // Se chegou aqui, falhou Online e Offline
+            return null;
         }
 
         // Método auxiliar para "abrir" o Token e ler o ID

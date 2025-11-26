@@ -15,30 +15,39 @@ namespace Eventhub.Desktop
         private static readonly HttpClient client = new HttpClient();
         public async Task<string> Inscrever(long usuarioId, long eventoId)
         {
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", Sessao.Token);
-
-            var dados = new { usuarioId = usuarioId, eventoId = eventoId };
-            var json = JsonConvert.SerializeObject(dados);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+            // TENTATIVA 1: ONLINE
             try
             {
+                // Configura o Token
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", Sessao.Token);
+
+                var dados = new { usuarioId = usuarioId, eventoId = eventoId };
+                var json = JsonConvert.SerializeObject(dados);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
                 var response = await client.PostAsync(BASE_URL, content);
 
-                // Se deu certo (200 OK)
-                if (response.IsSuccessStatusCode)
-                {
-                    return "OK";
-                }
+                if (response.IsSuccessStatusCode) return "OK";
 
-                // Se deu erro (400 Bad Request), lê a mensagem que o Java mandou
-                string erroDoJava = await response.Content.ReadAsStringAsync();
-                return erroDoJava;
+                // Se o servidor respondeu erro (ex: 400), é erro de negócio (já inscrito), não salva offline!
+                return await response.Content.ReadAsStringAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return "Erro de conexão: " + ex.Message;
+                // SE DEU ERRO DE CONEXÃO (CAIU NO CATCH):
+                // Salva no banco local para enviar depois
+                try
+                {
+                    LocalDbService db = new LocalDbService();
+                    // Nota: Usamos o Email porque o ID pode mudar ou ser local temporário
+                    db.AdicionarFilaInscricao(Sessao.EmailUsuario, eventoId);
+                    return "OFFLINE_OK"; // Código especial para avisar a tela
+                }
+                catch (Exception exLocal)
+                {
+                    return "Erro total: " + exLocal.Message;
+                }
             }
         }
     }

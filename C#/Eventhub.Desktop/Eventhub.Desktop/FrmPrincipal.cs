@@ -19,15 +19,40 @@ namespace Eventhub.Desktop
         {
             try
             {
+                // 1. Tenta buscar na Nuvem (VM)
                 EventoService service = new EventoService();
-                var lista = await service.ListarEventos();
+                var listaNuvem = await service.ListarEventos();
 
-                // Joga a lista direto na tabela. O C# cria as colunas sozinho!
-                dataGridView1.DataSource = lista;
+                // 2. Se deu certo, salva no Banco Local (Backup)
+                LocalDbService db = new LocalDbService();
+                db.AtualizarCacheEventos(listaNuvem);
+
+                // Mostra na tela
+                dataGridView1.DataSource = listaNuvem;
+                this.Text = "EVENTHUB (Online 🟢)";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show("Erro ao carregar eventos: " + ex.Message);
+                try
+                {
+                    LocalDbService db = new LocalDbService();
+                    var listaLocal = db.ListarEventosOffline();
+
+                    if (listaLocal.Count > 0)
+                    {
+                        dataGridView1.DataSource = listaLocal;
+                        MessageBox.Show("Sem conexão com o servidor.\nMostrando dados salvos localmente.", "Modo Offline", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        this.Text = "EVENTHUB (Offline 🔴)";
+                    }
+                    else
+                    {
+                        MessageBox.Show("Sem internet e sem dados locais.\nConecte-se para baixar os dados pela primeira vez.");
+                    }
+                }
+                catch (Exception exLocal)
+                {
+                    MessageBox.Show("Erro fatal: " + exLocal.Message);
+                }
             }
         }
 
@@ -66,22 +91,20 @@ namespace Eventhub.Desktop
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question);
 
-                if (confirmacao == DialogResult.Yes)
+                InscricaoService service = new InscricaoService();
+                string resultado = await service.Inscrever(Sessao.UsuarioId, eventoSelecionado.Id);
+
+                if (resultado == "OK")
                 {
-                    InscricaoService service = new InscricaoService();
-
-                    //Recebe a String com o resultado da inscrição
-                    string resultado = await service.Inscrever(Sessao.UsuarioId, eventoSelecionado.Id);
-
-                    if (resultado == "OK")
-                    {
-                        MessageBox.Show("Inscrição realizada com sucesso! 🎉", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        // Mostra EXATAMENTE o que o Java respondeu (Ex: Usuário já inscrito)
-                        MessageBox.Show("Atenção: " + resultado, "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    MessageBox.Show("Inscrição realizada com sucesso!", "Sucesso Online");
+                }
+                else if (resultado == "OFFLINE_OK")
+                {
+                    MessageBox.Show("Sem internet no momento.\n\nSua inscrição foi salva no dispositivo e será enviada assim que a conexão voltar!", "Modo Offline", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Atenção: " + resultado, "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             catch (Exception ex)
@@ -122,13 +145,14 @@ namespace Eventhub.Desktop
 
                     if (resultado == "OK")
                     {
-                        MessageBox.Show("Presença confirmada com sucesso! ✅\nO certificado já estará disponível.", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Presença confirmada!", "Sucesso Online");
+                    }
+                    else if (resultado == "OFFLINE_OK")
+                    {
+                        MessageBox.Show("Sem internet.\n\nO Check-in foi salvo localmente e será sincronizado depois!", "Modo Offline", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
-                        // Mostra o erro (ex: já fez check-in) ou uma mensagem genérica se vier vazio
-                        if (string.IsNullOrEmpty(resultado)) resultado = "Erro ao registrar. Verifique se já não foi feito.";
-
                         MessageBox.Show("Atenção: " + resultado, "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
@@ -137,6 +161,81 @@ namespace Eventhub.Desktop
             {
                 MessageBox.Show("Erro técnico: " + ex.Message);
             }
+        }
+
+        private async void btnSync_Click(object sender, EventArgs e)
+        {
+            // 1. VERIFICAÇÃO INTELIGENTE
+            // Se o token for o "falso" do modo offline, renova
+            if (Sessao.Token == "TOKEN_OFFLINE" || Sessao.Token == "OFFLINE")
+            {
+                // Abre a janelinha de senha
+                FrmSenha formSenha = new FrmSenha();
+                if (formSenha.ShowDialog() == DialogResult.OK)
+                {
+                    string senha = formSenha.SenhaDigitada;
+
+                    // Tenta logar na VM agora
+                    AuthService auth = new AuthService();
+                    string novoToken = await auth.Login(Sessao.EmailUsuario, senha);
+
+                    if (novoToken != null && novoToken != "OFFLINE" && novoToken != "TOKEN_OFFLINE")
+                    {
+                        MessageBox.Show("Conexão restabelecida! 🟢\nIniciando sincronização...", "Online");
+                        this.Text = "EVENTHUB (Online 🟢)";
+                        // O método Login já atualizou o Sessao.Token, então podemos seguir!
+                    }
+                    else
+                    {
+                        MessageBox.Show("Senha incorreta ou sem internet. Não é possível sincronizar agora.", "Erro");
+                        return; // Cancela a sincronização
+                    }
+                }
+                else
+                {
+                    return; // Usuário cancelou a senha
+                }
+            }
+
+            LocalDbService db = new LocalDbService();
+            int sucessoInscricoes = 0;
+            int sucessoPresencas = 0;
+
+            // 1. Sincronizar Inscrições
+            var filaInscricoes = db.ObterPendencias("FilaInscricoes");
+            foreach (System.Data.DataRow row in filaInscricoes.Rows)
+            {
+                long eventoId = Convert.ToInt64(row["EventoId"]);
+                long idFila = Convert.ToInt64(row["Id"]);
+
+                InscricaoService service = new InscricaoService();
+                string res = await service.Inscrever(Sessao.UsuarioId, eventoId);
+
+                if (res == "OK" || res.Contains("já inscrito"))
+                {
+                    db.RemoverDaFila("FilaInscricoes", idFila);
+                    sucessoInscricoes++;
+                }
+            }
+
+            // 2. Sincronizar Presenças
+            var filaPresencas = db.ObterPendencias("FilaPresencas");
+            foreach (System.Data.DataRow row in filaPresencas.Rows)
+            {
+                long eventoId = Convert.ToInt64(row["EventoId"]);
+                long idFila = Convert.ToInt64(row["Id"]);
+
+                PresencaService service = new PresencaService();
+                string res = await service.RegistrarPresenca(Sessao.UsuarioId, eventoId);
+
+                if (res == "OK" || res.Contains("já realizou"))
+                {
+                    db.RemoverDaFila("FilaPresencas", idFila);
+                    sucessoPresencas++;
+                }
+            }
+
+            MessageBox.Show($"Sincronização concluída!\n\nInscrições enviadas: {sucessoInscricoes}\nPresenças enviadas: {sucessoPresencas}");
         }
     }
 }

@@ -5,6 +5,10 @@ namespace Eventhub.Desktop
         public Form1()
         {
             InitializeComponent();
+
+            // Inicializa o banco local
+            LocalDbService db = new LocalDbService();
+            db.InicializarBanco();
         }
 
         private async void btnLogin_Click(object sender, EventArgs e)

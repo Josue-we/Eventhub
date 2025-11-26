@@ -17,35 +17,37 @@ namespace Eventhub.Desktop
 
         public async Task<string> RegistrarPresenca(long usuarioId, long eventoId)
         {
-            // Adiciona o Token
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", Sessao.Token);
-
-            var dados = new
-            {
-                usuarioId = usuarioId,
-                eventoId = eventoId
-            };
-
-            var json = JsonConvert.SerializeObject(dados);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+            // TENTATIVA 1: ONLINE
             try
             {
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", Sessao.Token);
+
+                var dados = new { usuarioId = usuarioId, eventoId = eventoId };
+                var json = JsonConvert.SerializeObject(dados);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
                 var response = await client.PostAsync(BASE_URL, content);
 
-                // Se deu 200 OK, deu certo
-                if (response.IsSuccessStatusCode)
-                {
-                    return "OK";
-                }
+                if (response.IsSuccessStatusCode) return "OK";
 
-                // Se deu erro, tenta ler a mensagem do servidor
+                // Se o servidor respondeu (ex: erro 400), retorna o erro real
                 return await response.Content.ReadAsStringAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return "Erro de conexão: " + ex.Message;
+                // SE FALHAR CONEXÃO (OFFLINE):
+                try
+                {
+                    LocalDbService db = new LocalDbService();
+                    // Guarda na fila para depois
+                    db.AdicionarFilaPresenca(Sessao.EmailUsuario, eventoId);
+                    return "OFFLINE_OK";
+                }
+                catch (Exception exLocal)
+                {
+                    return "Erro total: " + exLocal.Message;
+                }
             }
         }
     }

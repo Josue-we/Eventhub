@@ -33,6 +33,7 @@
             button1 = new Button();
             btnInscrever = new Button();
             btnCheckin = new Button();
+            btnSync = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -88,11 +89,22 @@
             btnCheckin.UseVisualStyleBackColor = false;
             btnCheckin.Click += btnCheckin_Click;
             // 
+            // btnSync
+            // 
+            btnSync.Location = new Point(594, 409);
+            btnSync.Name = "btnSync";
+            btnSync.Size = new Size(94, 29);
+            btnSync.TabIndex = 5;
+            btnSync.Text = "Sincronizar";
+            btnSync.UseVisualStyleBackColor = true;
+            btnSync.Click += btnSync_Click;
+            // 
             // FrmPrincipal
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnSync);
             Controls.Add(btnCheckin);
             Controls.Add(btnInscrever);
             Controls.Add(button1);
@@ -113,5 +125,6 @@
         private Button button1;
         private Button btnInscrever;
         private Button btnCheckin;
+        private Button btnSync;
     }
 }
