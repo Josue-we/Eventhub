@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/eventos")
+@CrossOrigin(origins = "*") // <--- Permitir acesso Web
 public class EventoController {
 
     @Autowired

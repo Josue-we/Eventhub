@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/emails")
+@CrossOrigin(origins = "*") // <--- Permitir acesso Web
 public class EmailController {
 
     @Autowired

@@ -12,6 +12,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/certificados")
+@CrossOrigin(origins = "*") // <--- Permitir acesso Web
 public class CertificadoController {
 
     @Autowired
@@ -50,7 +51,7 @@ public class CertificadoController {
         Optional<Certificado> cert = certificadoRepository.findByCodigoAutenticacao(codigo);
 
         if (cert.isPresent()) {
-            return ResponseEntity.ok(cert.get()); // Retorna os dados para mostrar na tela
+            return ResponseEntity.ok(cert.get());
         } else {
             return ResponseEntity.status(404).body("Certificado inválido ou inexistente.");
         }

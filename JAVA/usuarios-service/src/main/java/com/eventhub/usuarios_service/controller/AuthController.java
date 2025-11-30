@@ -9,19 +9,20 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "*") // <--- Permitir acesso Web
 public class AuthController {
 
     @Autowired
     private AuthService authService;
 
-@PostMapping
-public ResponseEntity<?> autenticar(@RequestBody LoginRequest request) {
-    try {
-        String token = authService.autenticar(request);
-        LoginResponse response = new LoginResponse(token);
-        return ResponseEntity.ok(response);
-    } catch (Exception e) {
-        return ResponseEntity.status(401).body("Credenciais inválidas: " + e.getMessage());
+    @PostMapping
+    public ResponseEntity<?> autenticar(@RequestBody LoginRequest request) {
+        try {
+            String token = authService.autenticar(request);
+            LoginResponse response = new LoginResponse(token);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Credenciais inválidas: " + e.getMessage());
+        }
     }
-}
 }

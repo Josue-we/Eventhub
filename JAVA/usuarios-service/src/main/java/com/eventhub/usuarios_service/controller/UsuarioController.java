@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/usuarios")
+@CrossOrigin(origins = "*") // <--- Permitir acesso Web
 public class UsuarioController {
 
     @Autowired

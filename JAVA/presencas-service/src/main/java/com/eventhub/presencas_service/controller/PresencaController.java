@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/presencas")
+@CrossOrigin(origins = "*") // <--- Permitir acesso Web
 public class PresencaController {
 
     @Autowired
