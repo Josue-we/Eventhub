@@ -165,7 +165,7 @@ async function carregarMinhasInscricoes() {
             <td>${evento.local}</td>
             <td>
                 <button class="btn-checkin" onclick="checkin(${evento.id})">Check-in</button>
-                <button class="btn-cert" onclick="certificado(${evento.id})">Certificado</button>
+                <button class="btn-cert" onclick="certificado(${evento.id}, '${evento.nome}')">Certificado</button>
                 <button class="btn-cancelar" onclick="cancelarInscricao(${inscricao.id})">Cancelar Inscrição</button>
             </td>
         `;
@@ -214,11 +214,13 @@ async function checkin(eventoId) {
     }
 }
 
-async function certificado(eventoId) {
+async function certificado(eventoId, nomeEvento) {
     const usuarioId = localStorage.getItem('usuarioId');
     const token = localStorage.getItem('token');
     
-    // Certificado exige leitura de resposta, por isso não usa processarAcao genérico
+    // Se não tiver nome do evento (veio de outra tela), tenta buscar ou usa genérico
+    const nomeEventoPDF = nomeEvento || "Evento Acadêmico"; 
+
     try {
         const response = await fetch(APIS.CERTIFICADOS, {
             method: 'POST',
@@ -228,7 +230,13 @@ async function certificado(eventoId) {
         
         if(response.ok) {
             const data = await response.json();
-            alert(`🎓 CERTIFICADO EMITIDO!\n\nCódigo de Validação: ${data.codigoAutenticacao}\n\n(Copie este código para validar a autenticidade)`);
+            const codigo = data.codigoAutenticacao;
+            const dataEmissao = new Date().toLocaleDateString('pt-BR');
+            const nomeUsuario = localStorage.getItem('email'); // Idealmente seria o Nome, mas usamos o email/login por enquanto
+
+            if(confirm(`Certificado Gerado!\nCódigo: ${codigo}\n\nDeseja baixar o PDF agora?`)) {
+                gerarPDF(nomeUsuario, nomeEventoPDF, dataEmissao, codigo);
+            }
         } else {
             const erro = await response.text();
             alert("Aviso: " + erro); 
@@ -236,6 +244,53 @@ async function certificado(eventoId) {
     } catch (e) {
         alert("Erro ao emitir certificado. Verifique sua conexão.");
     }
+}
+
+// --- FUNÇÃO GERADORA DE PDF ---
+function gerarPDF(nome, evento, data, codigo) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape' });
+
+    // Borda
+    doc.setLineWidth(3);
+    doc.rect(10, 10, 277, 190);
+
+    // Título
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(40);
+    doc.setTextColor(0, 51, 102); // Azul escuro
+    doc.text("CERTIFICADO", 148.5, 50, null, null, "center");
+
+    // Corpo
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+    doc.text("Certificamos que", 148.5, 80, null, null, "center");
+
+    doc.setFontSize(30);
+    doc.setFont("times", "bolditalic");
+    doc.text(nome, 148.5, 95, null, null, "center");
+
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "normal");
+    doc.text("participou com êxito do evento", 148.5, 115, null, null, "center");
+
+    doc.setFontSize(25);
+    doc.setFont("helvetica", "bold");
+    doc.text(evento, 148.5, 130, null, null, "center");
+
+    // Rodapé
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Data de Emissão: ${data}`, 20, 170);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Código de Autenticidade: ${codigo}`, 148.5, 195, null, null, "center");
+    doc.text(`Verifique em: http://177.44.248.77/certificados/validar/${codigo}`, 148.5, 200, null, null, "center");
+
+    // Salvar
+    doc.save(`Certificado_${evento}.pdf`);
 }
 
 async function alterarSenha() {
