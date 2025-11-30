@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>EventHub - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="navbar">
+        <h2>Eventos Disponíveis</h2>
+        <div>
+            <button onclick="window.location.href='minhas_inscricoes.html'" class="btn-info" style="background-color: #17a2b8;">Minhas Inscrições</button>
+            <button onclick="logout()" class="btn-sair">Sair</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="statusConexao" class="status online">Verificando...</div>
+        
+        <div class="actions-bar">
+            <button onclick="carregarDashboard()">Atualizar Lista</button>
+            <button id="btnStaff" onclick="iniciarCadastroRapido()" class="btn-rapido" style="background-color: #e83e8c; display: none;">Cadastro Rápido (Staff)</button>
+            <button onclick="sincronizar()" id="btnSync" class="btn-sync" style="display:none;">Sincronizar</button>
+        </div>
+
+        <table id="tabelaEventos">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Local</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="listaCorpo">
+                </tbody>
+        </table>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        verificarAutenticacao();
+        carregarDashboard();
+        verificarPendencias();
+        verificarPermissaoStaff();
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container login-box">
+        <h1>EventHub</h1>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="password" id="senha" placeholder="Senha" required>
+            <button type="submit" id="btnEntrar">Entrar</button>
+        </form>
+        <p class="link-cadastro">
+            Não tem conta? <a href="cadastro.html">Cadastre-se aqui</a>
+        </p>
+        <p id="msg" class="erro"></p>
+    </div>
+    <script src="app.js"></script>
+    <script>
+        // Se já tiver token, vai direto para o dashboard
+        if(localStorage.getItem('token')) window.location.href = 'dashboard.html';
+        
+        document.getElementById('loginForm').addEventListener('submit', realizarLogin);
+    </script>
+</body>
+</html>

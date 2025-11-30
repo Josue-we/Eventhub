@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>EventHub - Cadastro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container login-box">
+        <h1>Novo Usuário</h1>
+        <form id="cadastroForm">
+            <input type="text" id="nome" placeholder="Nome Completo" required>
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="password" id="senha" placeholder="Senha" required>
+            <button type="submit" id="btnCadastrar">Cadastrar</button>
+        </form>
+        <p class="link-cadastro">
+            <a href="index.html">Voltar para Login</a>
+        </p>
+        <p id="msg" class="erro"></p>
+    </div>
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('cadastroForm').addEventListener('submit', realizarCadastro);
+    </script>
+</body>
+</html>

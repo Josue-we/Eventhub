@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>EventHub - Minhas Inscrições</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="navbar">
+        <h2>Meus Eventos</h2>
+        <div>
+            <button onclick="window.location.href='dashboard.html'" style="background-color: #6c757d;">⬅ Voltar</button>
+            <button onclick="logout()" class="btn-sair">Sair</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="statusConexao" class="status online">Verificando...</div>
+        
+        <div class="actions-bar">
+            <button onclick="sincronizar()" id="btnSync" class="btn-sync" style="display:none;">Sincronizar</button>
+        </div>
+
+        <h3>Eventos que você participa:</h3>
+        <table id="tabelaMinhasInscricoes">
+            <thead>
+                <tr>
+                    <th>Evento</th>
+                    <th>Descrição</th>
+                    <th>Local</th>
+                    <th>Gerenciar</th>
+                </tr>
+            </thead>
+            <tbody id="listaMinhasInscricoes">
+                </tbody>
+        </table>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        verificarAutenticacao();
+        carregarMinhasInscricoes();
+        verificarPendencias();
+    </script>
+</body>
+</html>
