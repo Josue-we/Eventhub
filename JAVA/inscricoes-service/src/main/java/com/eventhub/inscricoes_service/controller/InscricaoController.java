@@ -33,21 +33,37 @@ public class InscricaoController {
         return i.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+@PostMapping
     public ResponseEntity<?> criar(@RequestBody Inscricao inscricao) {
-        // verifica se já existe inscrição ATIVA
-        Optional<Inscricao> existente = inscricaoRepository.findByUsuarioIdAndEventoId(
-                inscricao.getUsuarioId(), 
-                inscricao.getEventoId()
-        );
+        try {
+            // 1. Verifica se existe ALGUM registro (seja Ativo ou Cancelado)
+            Optional<Inscricao> existente = inscricaoRepository.findByUsuarioIdAndEventoId(
+                    inscricao.getUsuarioId(), 
+                    inscricao.getEventoId()
+            );
 
-        if (existente.isPresent() && "ATIVA".equals(existente.get().getStatus())) {
-            return ResponseEntity.badRequest().body("Usuário já inscrito neste evento!");
+            if (existente.isPresent()) {
+                Inscricao inscricaoNoBanco = existente.get();
+
+                if ("ATIVA".equals(inscricaoNoBanco.getStatus())) {
+                    return ResponseEntity.badRequest().body("Usuário já inscrito neste evento!");
+                }
+
+                inscricaoNoBanco.setStatus("ATIVA");
+                
+                inscricaoNoBanco.setDataInscricao(java.time.LocalDateTime.now());
+                
+                Inscricao reativada = inscricaoRepository.save(inscricaoNoBanco);
+                return ResponseEntity.ok(reativada);
+            }
+            
+            inscricao.setStatus("ATIVA");
+            Inscricao nova = inscricaoRepository.save(inscricao);
+            return ResponseEntity.ok(nova);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao processar inscrição: " + e.getMessage());
         }
-
-        inscricao.setStatus("ATIVA");
-        Inscricao nova = inscricaoRepository.save(inscricao);
-        return ResponseEntity.ok(nova);
     }
 
     @DeleteMapping("/{id}")
