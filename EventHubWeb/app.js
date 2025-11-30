@@ -218,10 +218,10 @@ async function certificado(eventoId, nomeEvento) {
     const usuarioId = localStorage.getItem('usuarioId');
     const token = localStorage.getItem('token');
     
-    // Se não tiver nome do evento (veio de outra tela), tenta buscar ou usa genérico
     const nomeEventoPDF = nomeEvento || "Evento Acadêmico"; 
 
     try {
+        // 1. Busca os dados do Certificado (Gera UUID)
         const response = await fetch(APIS.CERTIFICADOS, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
@@ -232,10 +232,21 @@ async function certificado(eventoId, nomeEvento) {
             const data = await response.json();
             const codigo = data.codigoAutenticacao;
             const dataEmissao = new Date().toLocaleDateString('pt-BR');
-            const nomeUsuario = localStorage.getItem('email'); // Idealmente seria o Nome, mas usamos o email/login por enquanto
+
+            // 2. BUSCA O NOME REAL DO USUÁRIO (A novidade aqui!)
+            let nomeReal = "Participante";
+            try {
+                const resUser = await fetch(`${APIS.USUARIOS}/${usuarioId}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (resUser.ok) {
+                    const dadosUser = await resUser.json();
+                    nomeReal = dadosUser.nome; // Pega o nome do banco de dados
+                }
+            } catch (err) { console.error("Erro ao buscar nome", err); }
 
             if(confirm(`Certificado Gerado!\nCódigo: ${codigo}\n\nDeseja baixar o PDF agora?`)) {
-                gerarPDF(nomeUsuario, nomeEventoPDF, dataEmissao, codigo);
+                gerarPDF(nomeReal, nomeEventoPDF, dataEmissao, codigo);
             }
         } else {
             const erro = await response.text();
@@ -251,45 +262,51 @@ function gerarPDF(nome, evento, data, codigo) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'landscape' });
 
-    // Borda
+    // Borda (Margem)
     doc.setLineWidth(3);
     doc.rect(10, 10, 277, 190);
 
     // Título
     doc.setFont("helvetica", "bold");
     doc.setFontSize(40);
-    doc.setTextColor(0, 51, 102); // Azul escuro
-    doc.text("CERTIFICADO", 148.5, 50, null, null, "center");
+    doc.setTextColor(0, 51, 102); // Azul Marinho
+    doc.text("CERTIFICADO", 148.5, 40, null, null, "center");
 
-    // Corpo
+    // Corpo do Texto
     doc.setFontSize(20);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(0, 0, 0);
-    doc.text("Certificamos que", 148.5, 80, null, null, "center");
+    doc.setTextColor(0, 0, 0); // Preto
+    doc.text("Certificamos que", 148.5, 70, null, null, "center");
 
+    // Nome do Participante (Destaque)
     doc.setFontSize(30);
     doc.setFont("times", "bolditalic");
-    doc.text(nome, 148.5, 95, null, null, "center");
+    doc.text(nome, 148.5, 90, null, null, "center");
 
     doc.setFontSize(20);
     doc.setFont("helvetica", "normal");
-    doc.text("participou com êxito do evento", 148.5, 115, null, null, "center");
+    doc.text("participou com êxito do evento", 148.5, 110, null, null, "center");
 
-    doc.setFontSize(25);
+    // Nome do Evento
+    doc.setFontSize(26);
     doc.setFont("helvetica", "bold");
     doc.text(evento, 148.5, 130, null, null, "center");
 
-    // Rodapé
+    // Data (Subimos para não bater no rodapé)
     doc.setFontSize(14);
     doc.setFont("helvetica", "normal");
-    doc.text(`Data de Emissão: ${data}`, 20, 170);
+    doc.text(`Data de Emissão: ${data}`, 20, 160);
     
+    // Rodapé (Código de Validação) - Agora em preto e mais para cima
     doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Código de Autenticidade: ${codigo}`, 148.5, 195, null, null, "center");
-    doc.text(`Verifique em: http://177.44.248.77/certificados/validar/${codigo}`, 148.5, 200, null, null, "center");
+    doc.setTextColor(0, 0, 0); // PRETO (Antes estava cinza 100)
+    
+    doc.text(`Código de Autenticidade: ${codigo}`, 148.5, 180, null, null, "center");
+    
+    // Link de validação (Quebra de linha se necessário, mas aqui subimos a posição)
+    const linkValidacao = `Verifique em: http://177.44.248.77/certificados/validar/${codigo}`;
+    doc.text(linkValidacao, 148.5, 188, null, null, "center");
 
-    // Salvar
     doc.save(`Certificado_${evento}.pdf`);
 }
 
