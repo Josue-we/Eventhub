@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Eventhub.Desktop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+96cfcb039e1eb422c16ffe1c98b71c8243c6c512")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ce3330c4613e23471e818a923dee87a3715ed789")]
 [assembly: System.Reflection.AssemblyProductAttribute("Eventhub.Desktop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Eventhub.Desktop")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

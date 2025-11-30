@@ -217,5 +217,24 @@ namespace Eventhub.Desktop
                 cmd.ExecuteNonQuery();
             }
         }
+        // Salva um usuário novo quando não há internet
+        public void SalvarNovoUsuarioOffline(string nome, string email, string senha)
+        {
+            using (var conexao = new SQLiteConnection(STRING_CONEXAO))
+            {
+                conexao.Open();
+
+                // O campo NovoLocalmente = 1 indica que ele ainda não existe na nuvem
+                string sql = "INSERT INTO Usuarios (Nome, Email, Senha, NovoLocalmente) VALUES (@nome, @email, @senha, 1)";
+
+                using (var cmd = new SQLiteCommand(sql, conexao))
+                {
+                    cmd.Parameters.AddWithValue("@nome", nome);
+                    cmd.Parameters.AddWithValue("@email", email);
+                    cmd.Parameters.AddWithValue("@senha", senha);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

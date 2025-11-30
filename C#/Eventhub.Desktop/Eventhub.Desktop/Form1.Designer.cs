@@ -33,6 +33,7 @@
             label2 = new Label();
             txtSenha = new TextBox();
             btnLogin = new Button();
+            lnkCadastro = new LinkLabel();
             SuspendLayout();
             // 
             // label1
@@ -70,7 +71,7 @@
             // 
             // btnLogin
             // 
-            btnLogin.Location = new Point(352, 409);
+            btnLogin.Location = new Point(360, 325);
             btnLogin.Name = "btnLogin";
             btnLogin.Size = new Size(94, 29);
             btnLogin.TabIndex = 4;
@@ -78,11 +79,23 @@
             btnLogin.UseVisualStyleBackColor = true;
             btnLogin.Click += btnLogin_Click;
             // 
+            // lnkCadastro
+            // 
+            lnkCadastro.AutoSize = true;
+            lnkCadastro.Location = new Point(363, 357);
+            lnkCadastro.Name = "lnkCadastro";
+            lnkCadastro.Size = new Size(87, 20);
+            lnkCadastro.TabIndex = 5;
+            lnkCadastro.TabStop = true;
+            lnkCadastro.Text = "Cadastre-se";
+            lnkCadastro.LinkClicked += lnkCadastro_LinkClicked;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(lnkCadastro);
             Controls.Add(btnLogin);
             Controls.Add(txtSenha);
             Controls.Add(label2);
@@ -101,5 +114,6 @@
         private Label label2;
         private TextBox txtSenha;
         private Button btnLogin;
+        private LinkLabel lnkCadastro;
     }
 }

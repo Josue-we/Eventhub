@@ -50,5 +50,11 @@ namespace Eventhub.Desktop
                 btnLogin.Text = "Entrar";
             }
         }
+
+        private void lnkCadastro_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            FrmCadastro telaCadastro = new FrmCadastro();
+            telaCadastro.ShowDialog(); // Abre como pop-up
+        }
     }
 }
