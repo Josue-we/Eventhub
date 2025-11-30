@@ -27,10 +27,10 @@ public class InscricaoController {
         return inscricaoRepository.findByUsuarioId(usuarioId);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Inscricao> buscarPorId(@PathVariable Long id) {
-        Optional<Inscricao> i = inscricaoRepository.findById(id);
-        return i.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/usuario/{usuarioId}")
+    public List<Inscricao> listarPorUsuario(@PathVariable Long usuarioId) {
+        // CORREÇÃO: Chama o método que filtra por "ATIVA"
+        return inscricaoRepository.findByUsuarioIdAndStatus(usuarioId, "ATIVA");
     }
 
     @PostMapping

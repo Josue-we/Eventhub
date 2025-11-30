@@ -7,9 +7,8 @@ import java.util.List;
 
 public interface InscricaoRepository extends JpaRepository<Inscricao, Long> {
     
-    // Busca para evitar duplicidade
-    Optional<Inscricao> findByUsuarioIdAndEventoId(Long usuarioId, Long eventoId);
+    // O Spring Data entende isso automaticamente se o campo se chama 'status'
+    List<Inscricao> findByUsuarioIdAndStatus(Long usuarioId, String status);
 
-    // Busca para listar todas as inscrições de um usuário específico
-    List<Inscricao> findByUsuarioId(Long usuarioId);
+    Optional<Inscricao> findByUsuarioIdAndEventoId(Long usuarioId, Long eventoId);
 }
