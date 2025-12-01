@@ -247,6 +247,10 @@ async function certificado(eventoId, nomeEvento) {
 function gerarPDF(nome, evento, data, codigo) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'landscape' });
+<<<<<<< Updated upstream
+=======
+    const linkValidacao = `Valide em: http://177.44.248.77/validar.html?codigo=${codigo}`;
+>>>>>>> Stashed changes
     doc.setLineWidth(3); doc.rect(10, 10, 277, 190);
     doc.setFont("helvetica", "bold"); doc.setFontSize(40); doc.setTextColor(0, 51, 102);
     doc.text("CERTIFICADO", 148.5, 40, null, null, "center");
@@ -262,7 +266,11 @@ function gerarPDF(nome, evento, data, codigo) {
     doc.text(`Data: ${data}`, 20, 160);
     doc.setFontSize(10);
     doc.text(`Código: ${codigo}`, 148.5, 180, null, null, "center");
+<<<<<<< Updated upstream
     doc.text(`Valide em: http://177.44.248.77/certificados/validar/${codigo}`, 148.5, 188, null, null, "center");
+=======
+    doc.text(linkValidacao, 148.5, 188, null, null, "center");
+>>>>>>> Stashed changes
     doc.save(`Certificado.pdf`);
 }
 

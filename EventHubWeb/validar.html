@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validação de Certificado - EventHub</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .validacao-box { text-align: center; margin-top: 50px; }
+        .resultado { margin-top: 20px; padding: 20px; border-radius: 8px; }
+        .valido { background-color: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+        .invalido { background-color: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+        .detalhes { text-align: left; margin-top: 15px; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+    <div class="container validacao-box">
+        <h1>Verificação de Autenticidade</h1>
+        <p>Aguarde, estamos consultando o sistema...</p>
+        <div id="resultado" class="resultado" style="display: none;"></div>
+        <br>
+        <a href="index.html">Ir para o site principal</a>
+    </div>
+
+    <script>
+        const BASE_URL = "http://177.44.248.77"; // IP da VM
+
+        async function validar() {
+            // 1. Pega o código da URL (ex: validar.html?codigo=123-abc)
+            const params = new URLSearchParams(window.location.search);
+            const codigo = params.get('codigo');
+            const divRes = document.getElementById('resultado');
+
+            if (!codigo) {
+                mostrarErro("Nenhum código fornecido.");
+                return;
+            }
+
+            try {
+                // 2. Chama a API (Agora pública, sem token!)
+                const response = await fetch(`${BASE_URL}/certificados/validar/${codigo}`);
+
+                if (response.ok) {
+                    const cert = await response.json();
+                    
+                    // 3. Busca nome do usuário (Opcional: se a API de usuários for pública ou se o certificado já tiver o nome salvo. 
+                    // Como a API de usuários é privada, vamos mostrar o ID ou ajustar o Java para retornar o nome no JSON do certificado. 
+                    // Para simplificar agora, mostramos que é VÁLIDO).
+                    
+                    divRes.className = "resultado valido";
+                    divRes.innerHTML = `
+                        <h2>Certificado Válido!</h2>
+                        <div class="detalhes">
+                            <p><strong>Evento ID:</strong> ${cert.eventoId}</p>
+                            <p><strong>Usuário ID:</strong> ${cert.usuarioId}</p>
+                            <p><strong>Data Emissão:</strong> ${new Date(cert.dataEmissao).toLocaleDateString()}</p>
+                            <p><strong>Código:</strong> ${cert.codigoAutenticacao}</p>
+                        </div>
+                    `;
+                } else {
+                    mostrarErro("Certificado não encontrado ou inválido.");
+                }
+            } catch (e) {
+                mostrarErro("Erro de conexão com o servidor.");
+            }
+            divRes.style.display = 'block';
+        }
+
+        function mostrarErro(msg) {
+            const divRes = document.getElementById('resultado');
+            divRes.className = "resultado invalido";
+            divRes.innerHTML = `<h2>Inválido</h2><p>${msg}</p>`;
+            divRes.style.display = 'block';
+        }
+
+        validar();
+    </script>
+</body>
+</html>
