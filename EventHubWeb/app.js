@@ -46,64 +46,78 @@ async function enviarNotificacao(emailDestino, assunto, mensagem) {
     } catch (erro) { console.error("Erro email:", erro); }
 }
 
-// --- CORE: BUSCA DE DADOS ---
-async function carregarEventos() {
-    localStorage.removeItem('cache_inscricoes');
-    const statusDiv = document.getElementById('statusConexao');
+// --- CORE: BUSCA DE DADOS (AGORA COM PRESENÇAS) ---
+async function buscarDadosComCache() {
     const token = localStorage.getItem('token');
     const usuarioId = localStorage.getItem('usuarioId');
+    const statusDiv = document.getElementById('statusConexao');
 
     try {
-        const [resEventos, resInscricoes] = await Promise.all([
+        // CORREÇÃO: Busca Eventos, Inscrições E PRESENÇAS
+        const [resEventos, resInscricoes, resPresencas] = await Promise.all([
             fetch(APIS.EVENTOS, { headers: { 'Authorization': 'Bearer ' + token } }),
-            fetch(`${APIS.INSCRICOES}/usuario/${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + token } })
+            fetch(`${APIS.INSCRICOES}/usuario/${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + token } }),
+            fetch(APIS.PRESENCAS, { headers: { 'Authorization': 'Bearer ' + token } }) // Busca todas para filtrar
         ]);
 
-        if (resEventos.ok && resInscricoes.ok) {
+        if (resEventos.ok && resInscricoes.ok && resPresencas.ok) {
             const eventos = await resEventos.json();
             const inscricoes = await resInscricoes.json();
+            const todasPresencas = await resPresencas.json();
+            
+            // Filtra apenas as minhas
+            const minhasPresencas = todasPresencas.filter(p => p.usuarioId == usuarioId);
 
             localStorage.setItem('cache_eventos', JSON.stringify(eventos));
             localStorage.setItem('cache_inscricoes', JSON.stringify(inscricoes));
+            localStorage.setItem('cache_presencas', JSON.stringify(minhasPresencas));
 
-            renderizarTabela(eventos, inscricoes);
-            
             if(statusDiv) { statusDiv.className = "status online"; statusDiv.innerHTML = "Online 🟢 (Dados da Nuvem)"; }
             sincronizarAutomatico();
+            
+            return { eventos, inscricoes, presencas: minhasPresencas, online: true };
         } else { throw new Error("Erro API"); }
 
     } catch (err) {
         console.warn("Modo Offline.");
         const cacheEvt = localStorage.getItem('cache_eventos');
         const cacheIns = localStorage.getItem('cache_inscricoes');
+        const cachePres = localStorage.getItem('cache_presencas');
         
         if (cacheEvt) {
-            renderizarTabela(JSON.parse(cacheEvt), cacheIns ? JSON.parse(cacheIns) : []);
             if(statusDiv) { statusDiv.className = "status offline"; statusDiv.innerHTML = "Offline 🔴 (Cache Local)"; }
+            return { 
+                eventos: JSON.parse(cacheEvt || '[]'),
+                inscricoes: JSON.parse(cacheIns || '[]'),
+                presencas: JSON.parse(cachePres || '[]'),
+                online: false 
+            };
         } else {
             if(statusDiv) statusDiv.innerHTML = "Offline 🔴 (Sem dados)";
+            return null;
         }
     }
 }
 
-// --- RENDERIZAÇÃO ---
-function renderizarTabela(eventos, minhasInscricoes) {
+// --- RENDERIZAÇÃO DASHBOARD ---
+async function carregarDashboard() {
+    const dados = await buscarDadosComCache();
+    if(!dados) return;
+
     const tbody = document.getElementById('listaCorpo');
     if (!tbody) return;
     tbody.innerHTML = "";
     
-    // Admin check
     const emailRaw = localStorage.getItem('email');
     const emailLogado = emailRaw ? emailRaw.trim().toLowerCase() : "";
     const admins = ['admin@eventhub.com', 'staff@eventhub.com', 'josue@teste.com']; 
     const isAdmin = admins.includes(emailLogado);
 
-    // Botão Staff Global
     const btnStaffGlobal = document.getElementById('btnStaff');
     if(btnStaffGlobal) btnStaffGlobal.style.display = isAdmin ? 'inline-block' : 'none';
 
-    eventos.forEach(ev => {
-        const inscricaoEncontrada = minhasInscricoes.find(i => ((i.eventoId === ev.id) || (i.evento && i.evento.id === ev.id)) && i.status === 'ATIVA');
+    dados.eventos.forEach(ev => {
+        const inscricaoEncontrada = dados.inscricoes.find(i => ((i.eventoId === ev.id) || (i.evento && i.evento.id === ev.id)) && i.status === 'ATIVA');
         const tr = document.createElement('tr');
         let botoesHTML = "";
 
@@ -120,62 +134,36 @@ function renderizarTabela(eventos, minhasInscricoes) {
     });
 }
 
-function verificarPermissaoStaff() {
-    const btn = document.getElementById('btnStaff');
-    if(btn) {
-        const emailRaw = localStorage.getItem('email');
-        const emailLogado = emailRaw ? emailRaw.trim().toLowerCase() : "";
-        const admins = ['admin@eventhub.com', 'staff@eventhub.com', 'josue@teste.com'];
-        if(admins.includes(emailLogado)) btn.style.display = 'inline-block';
-        else btn.style.display = 'none';
-    }
-}
-
-// --- MINHAS INSCRIÇÕES ---
+// --- TELA 2: MINHAS INSCRIÇÕES (Com Validação de Certificado) ---
 async function carregarMinhasInscricoes() {
-    // Reutiliza a lógica de busca do dashboard para garantir consistência
-    // Mas aqui precisamos filtrar e mostrar botões de gestão
-    localStorage.removeItem('cache_inscricoes');
-    const token = localStorage.getItem('token');
-    const usuarioId = localStorage.getItem('usuarioId');
-    
-    try {
-        // Busca direta para garantir dados frescos
-        const [resEventos, resInscricoes] = await Promise.all([
-            fetch(APIS.EVENTOS, { headers: { 'Authorization': 'Bearer ' + token } }),
-            fetch(`${APIS.INSCRICOES}/usuario/${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + token } })
-        ]);
-
-        if (resEventos.ok && resInscricoes.ok) {
-            const eventos = await resEventos.json();
-            const inscricoes = await resInscricoes.json();
-            renderizarMinhasInscricoes(eventos, inscricoes);
-        }
-    } catch (e) {
-        // Fallback Cache
-        const cacheEvt = JSON.parse(localStorage.getItem('cache_eventos') || '[]');
-        const cacheIns = JSON.parse(localStorage.getItem('cache_inscricoes') || '[]');
-        renderizarMinhasInscricoes(cacheEvt, cacheIns);
-    }
-}
-
-function renderizarMinhasInscricoes(eventos, inscricoes) {
+    const dados = await buscarDadosComCache();
     const tbody = document.getElementById('listaMinhasInscricoes');
-    if (!tbody) return;
+    if (!tbody || !dados) return;
     tbody.innerHTML = "";
 
-    // Filtra apenas ativas
-    const ativas = inscricoes.filter(i => i.status === 'ATIVA');
+    const inscricoesAtivas = dados.inscricoes.filter(i => i.status === 'ATIVA');
 
-    if (ativas.length === 0) {
+    if (inscricoesAtivas.length === 0) {
         tbody.innerHTML = "<tr><td colspan='4' style='text-align:center'>Nenhuma inscrição ativa.</td></tr>";
         return;
     }
 
-    ativas.forEach(inscricao => {
+    inscricoesAtivas.forEach(inscricao => {
         let evento = inscricao.evento;
         if (!evento) {
-            evento = eventos.find(e => e.id === inscricao.eventoId) || { nome: "Desconhecido", descricao: "-", local: "-", id: inscricao.eventoId };
+            evento = dados.eventos.find(e => e.id === inscricao.eventoId) || { nome: "Evento", descricao: "-", local: "-", id: inscricao.eventoId };
+        }
+
+        // VERIFICAÇÃO DE PRESENÇA
+        const temPresenca = dados.presencas && dados.presencas.some(p => p.eventoId === evento.id);
+        
+        let btnCertificado = "";
+        if (temPresenca) {
+            // Ativo
+            btnCertificado = `<button class="btn-cert" onclick="certificado(${evento.id}, '${evento.nome}')">Certificado</button>`;
+        } else {
+            // Bloqueado (Cinza)
+            btnCertificado = `<button class="btn-cert" style="background-color: #ccc; cursor: not-allowed;" onclick="alert('Realize o Check-in primeiro!')">Certificado</button>`;
         }
 
         const tr = document.createElement('tr');
@@ -185,7 +173,7 @@ function renderizarMinhasInscricoes(eventos, inscricoes) {
             <td>${evento.local}</td>
             <td>
                 <button class="btn-checkin" onclick="checkin(${evento.id})">Check-in</button>
-                <button class="btn-cert" onclick="certificado(${evento.id}, '${evento.nome}')">Certificado</button>
+                ${btnCertificado}
                 <button class="btn-cancelar" onclick="cancelarInscricao(${inscricao.id})">Cancelar</button>
             </td>
         `;
@@ -211,7 +199,7 @@ async function cancelarInscricao(inscricaoId) {
             method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
         });
         if (res.ok) {
-            alert("Inscrição para o evento cancelada.");
+            alert("Cancelado.");
             window.location.reload(); 
         } else alert("Erro ao cancelar.");
     } catch (e) { alert("Erro de conexão (Offline)."); }
@@ -222,6 +210,7 @@ async function checkin(eventoId) {
     if(await processarAcao(APIS.PRESENCAS, { usuarioId, eventoId }, "Check-in")) {
         const email = localStorage.getItem('email');
         enviarNotificacao(email, "Bem-vindo!", "Check-in registrado.");
+        window.location.reload();
     }
 }
 
@@ -255,7 +244,6 @@ async function certificado(eventoId, nomeEvento) {
     } catch (e) { alert("Erro ao emitir."); }
 }
 
-// --- PDF ---
 function gerarPDF(nome, evento, data, codigo) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'landscape' });
