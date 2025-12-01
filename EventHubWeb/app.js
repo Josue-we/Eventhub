@@ -126,7 +126,7 @@ async function carregarDashboard() {
         } else {
             botoesHTML = `<button class="btn-acao" onclick="inscrever(${ev.id})">Inscrever-se</button>`;
             if (isAdmin) {
-                botoesHTML += ` <button style="background-color: #e83e8c; margin-left: 5px;" onclick="cadastrarECheckinVisitante(${ev.id})">⚡ Visitante</button>`;
+                botoesHTML += ` <button style="background-color: #e83e8c; margin-left: 5px;" onclick="cadastrarECheckinVisitante(${ev.id})">Visitante</button>`;
             }
         }
         tr.innerHTML = `<td><strong>${ev.nome}</strong></td><td>${ev.descricao}</td><td>${ev.local}</td><td>${botoesHTML}</td>`;
