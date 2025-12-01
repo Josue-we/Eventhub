@@ -6,14 +6,6 @@ import java.util.Optional;
 
 public interface CertificadoRepository extends JpaRepository<Certificado, Long> {
     
-<<<<<<< Updated upstream
-    Optional<Certificado> findByCodigoAutenticacao(String codigoAutenticacao);
-
-    // MANTÉM ESTE (usado para validação rápida)
-    boolean existsByUsuarioIdAndEventoId(Long usuarioId, Long eventoId);
-
-    // ADICIONA ESTE NOVO (para recuperar o objeto completo)
-=======
     // Busca pelo código UUID (para a validação pública)
     Optional<Certificado> findByCodigoAutenticacao(String codigoAutenticacao);
 
@@ -21,6 +13,5 @@ public interface CertificadoRepository extends JpaRepository<Certificado, Long> 
     boolean existsByUsuarioIdAndEventoId(Long usuarioId, Long eventoId);
 
     // --- NOVO: Busca o objeto completo (para devolver se já existir) ---
->>>>>>> Stashed changes
     Optional<Certificado> findByUsuarioIdAndEventoId(Long usuarioId, Long eventoId);
 }

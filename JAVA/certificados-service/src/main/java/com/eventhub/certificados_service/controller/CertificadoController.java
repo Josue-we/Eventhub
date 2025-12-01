@@ -26,31 +26,18 @@ public class CertificadoController {
 
     @PostMapping
     public ResponseEntity<?> emitir(@RequestBody Certificado certificado) {
-<<<<<<< Updated upstream
-        // 1. Tenta buscar um certificado que já exista para este usuário neste evento
-=======
         // Tenta buscar existente
->>>>>>> Stashed changes
         Optional<Certificado> existente = certificadoRepository.findByUsuarioIdAndEventoId(
                 certificado.getUsuarioId(), 
                 certificado.getEventoId()
         );
 
-<<<<<<< Updated upstream
-        // 2. Se já existir, RETORNA O ANTIGO (Sucesso 200) em vez de erro!
-        if (existente.isPresent()) {
-            return ResponseEntity.ok(existente.get());
-        }
-
-        // 3. Se não existir, cria um novo
-=======
         if (existente.isPresent()) {
             // RETORNA O ANTIGO (Sucesso 200) em vez de erro!
             return ResponseEntity.ok(existente.get());
         }
 
         // Cria novo
->>>>>>> Stashed changes
         certificado.setCodigoAutenticacao(UUID.randomUUID().toString());
         certificado.setDataEmissao(LocalDateTime.now());
         
