@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,8 +31,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Nota: Em sistemas reais, a rota de validar certificado costuma ser pública,
-                // mas seguiremos o requisito "rotas autenticadas".
+                // LIBERA A VALIDAÇÃO PÚBLICA (GET)
+                .requestMatchers(HttpMethod.GET, "/certificados/validar/**").permitAll()
+                // O RESTO É PRIVADO
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new JwtTokenFilter(jwtValidationService), UsernamePasswordAuthenticationFilter.class);
