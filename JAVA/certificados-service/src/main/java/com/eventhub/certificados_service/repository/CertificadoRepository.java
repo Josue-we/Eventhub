@@ -6,9 +6,11 @@ import java.util.Optional;
 
 public interface CertificadoRepository extends JpaRepository<Certificado, Long> {
     
-    // Busca para a validação pública/privada do certificado
     Optional<Certificado> findByCodigoAutenticacao(String codigoAutenticacao);
 
-    // Evita duplicidade de emissão
+    // MANTÉM ESTE (usado para validação rápida)
     boolean existsByUsuarioIdAndEventoId(Long usuarioId, Long eventoId);
+
+    // ADICIONA ESTE NOVO (para recuperar o objeto completo)
+    Optional<Certificado> findByUsuarioIdAndEventoId(Long usuarioId, Long eventoId);
 }

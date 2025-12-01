@@ -26,17 +26,18 @@ public class CertificadoController {
 
     @PostMapping
     public ResponseEntity<?> emitir(@RequestBody Certificado certificado) {
-        // 1. Verifica duplicidade
-        boolean jaEmitido = certificadoRepository.existsByUsuarioIdAndEventoId(
+        // 1. Tenta buscar um certificado que já exista para este usuário neste evento
+        Optional<Certificado> existente = certificadoRepository.findByUsuarioIdAndEventoId(
                 certificado.getUsuarioId(), 
                 certificado.getEventoId()
         );
 
-        if (jaEmitido) {
-            return ResponseEntity.badRequest().body("Certificado já emitido para este evento!");
+        // 2. Se já existir, RETORNA O ANTIGO (Sucesso 200) em vez de erro!
+        if (existente.isPresent()) {
+            return ResponseEntity.ok(existente.get());
         }
 
-        // 2. Gera dados do certificado
+        // 3. Se não existir, cria um novo
         certificado.setCodigoAutenticacao(UUID.randomUUID().toString());
         certificado.setDataEmissao(LocalDateTime.now());
         
