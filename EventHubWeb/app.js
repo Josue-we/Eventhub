@@ -291,7 +291,6 @@ async function cadastrarECheckinVisitante(eventoId) {
     const nome = prompt("Nome:"); if (!nome) return;
     const email = prompt("E-mail:"); if (!email) return;
     const senha = "123456";
-    alert("Aguarde...");
     try {
         const resCriar = await fetch(APIS.USUARIOS, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -337,7 +336,7 @@ async function processarAcao(url, corpo, tipo) {
         else { alert(await res.text()); return false; }
     } catch (err) {
         salvarNaFila(tipo, url, corpo);
-        alert(`Sem internet. ${tipo} salvo! 💾`);
+        alert(`Sem internet. ${tipo} salvo! Será sincronizado depois.`);
         verificarPendencias();
         return false;
     }
