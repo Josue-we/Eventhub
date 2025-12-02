@@ -39,6 +39,17 @@
         </table>
     </div>
 
+    <div id="modalSenha" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Nova Senha</h3>
+            <input type="password" id="inputNovaSenha" placeholder="Digite a nova senha">
+            <div style="margin-top: 15px;">
+                <button onclick="confirmarAlteracaoSenha()">Salvar</button>
+                <button onclick="fecharModalSenha()" style="background-color: #6c757d;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
     <script>
         verificarAutenticacao();
