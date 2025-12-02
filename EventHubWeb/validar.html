@@ -16,7 +16,6 @@
 <body>
     <div class="container validacao-box">
         <h1>Verificação de Autenticidade</h1>
-        <p>Aguarde, estamos consultando o sistema...</p>
         <div id="resultado" class="resultado" style="display: none;"></div>
         <br>
         <a href="index.html">Ir para o site principal</a>
@@ -51,8 +50,8 @@
                     divRes.innerHTML = `
                         <h2>Certificado Válido!</h2>
                         <div class="detalhes">
-                            <p><strong>Evento ID:</strong> ${cert.eventoId}</p>
-                            <p><strong>Usuário ID:</strong> ${cert.usuarioId}</p>
+                            <p><strong>Evento:</strong> ${cert.nomeEvento || cert.eventoId}</p>
+                            <p><strong>Participante:</strong> ${cert.nomeUsuario || cert.usuarioId}</p>
                             <p><strong>Data Emissão:</strong> ${new Date(cert.dataEmissao).toLocaleDateString()}</p>
                             <p><strong>Código:</strong> ${cert.codigoAutenticacao}</p>
                         </div>

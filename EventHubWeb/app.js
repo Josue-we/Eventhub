@@ -217,31 +217,50 @@ async function checkin(eventoId) {
 async function certificado(eventoId, nomeEvento) {
     const usuarioId = localStorage.getItem('usuarioId');
     const token = localStorage.getItem('token');
-    const nomeEventoPDF = nomeEvento || "Evento";
+    const nomeEventoPDF = nomeEvento || "Evento Acadêmico"; 
 
     try {
+        // 1. BUSCA O NOME REAL DO USUÁRIO (ANTES DE EMITIR!)
+        // Precisamos do nome para enviar ao Backend e gravar no certificado
+        let nomeReal = "Participante";
+        try {
+            const resUser = await fetch(`${APIS.USUARIOS}/${usuarioId}`, { 
+                headers: { 'Authorization': 'Bearer ' + token } 
+            });
+            if (resUser.ok) {
+                const dadosUser = await resUser.json();
+                nomeReal = dadosUser.nome; 
+            }
+        } catch (err) { console.error("Erro ao buscar nome", err); }
+
+        // 2. EMITE O CERTIFICADO (Enviando os nomes junto!)
         const response = await fetch(APIS.CERTIFICADOS, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-            body: JSON.stringify({ usuarioId, eventoId })
+            body: JSON.stringify({ 
+                usuarioId: usuarioId, 
+                eventoId: eventoId,
+                // NOVOS CAMPOS PARA O BACKEND GUARDAR:
+                nomeUsuario: nomeReal,
+                nomeEvento: nomeEventoPDF
+            })
         });
         
         if(response.ok) {
             const data = await response.json();
-            
-            let nomeReal = "Participante";
-            try {
-                const resUser = await fetch(`${APIS.USUARIOS}/${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + token } });
-                if(resUser.ok) nomeReal = (await resUser.json()).nome;
-            } catch(e){}
+            const codigo = data.codigoAutenticacao;
+            const dataEmissao = new Date().toLocaleDateString('pt-BR');
 
-            if(confirm(`Certificado Gerado!\nBaixar PDF?`)) {
-                gerarPDF(nomeReal, nomeEventoPDF, new Date().toLocaleDateString('pt-BR'), data.codigoAutenticacao);
+            if(confirm(`Certificado Gerado!\nCódigo: ${codigo}\n\nDeseja baixar o PDF agora?`)) {
+                gerarPDF(nomeReal, nomeEventoPDF, dataEmissao, codigo);
             }
         } else {
-            alert("Aviso: " + await response.text());
+            const erro = await response.text();
+            alert("Aviso: " + erro); 
         }
-    } catch (e) { alert("Erro ao emitir."); }
+    } catch (e) {
+        alert("Erro ao emitir certificado. Verifique sua conexão.");
+    }
 }
 
 function gerarPDF(nome, evento, data, codigo) {
