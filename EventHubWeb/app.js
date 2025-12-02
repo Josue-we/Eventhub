@@ -465,3 +465,47 @@ if (cadastroForm) {
         }
     });
 }
+// --- ALTERAR SENHA ---
+async function alterarSenha() {
+    const novaSenha = prompt("Digite sua nova senha:");
+    if (!novaSenha) return; // Se cancelar ou deixar vazio, para aqui.
+
+    const usuarioId = localStorage.getItem('usuarioId');
+    const token = localStorage.getItem('token');
+
+    try {
+        // 1. Busca os dados atuais do usuário 
+        // (Precisamos do objeto completo para não apagar o Nome/Email no update)
+        const resGet = await fetch(`${APIS.USUARIOS}/${usuarioId}`, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!resGet.ok) throw new Error("Erro ao buscar dados do usuário.");
+
+        const usuarioAtual = await resGet.json();
+        
+        // 2. Define a nova senha no objeto
+        usuarioAtual.senha = novaSenha;
+
+        // 3. Envia o objeto atualizado (PUT)
+        const resPut = await fetch(`${APIS.USUARIOS}/${usuarioId}`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token 
+            },
+            body: JSON.stringify(usuarioAtual)
+        });
+
+        if (resPut.ok) {
+            alert("Senha alterada com sucesso!\nPor favor, faça login novamente com a nova senha.");
+            logout(); // Desloga o usuário
+        } else {
+            alert("Erro ao alterar a senha. Tente novamente.");
+        }
+    } catch (erro) {
+        console.error(erro);
+        alert("Erro técnico: " + erro.message);
+    }
+}
