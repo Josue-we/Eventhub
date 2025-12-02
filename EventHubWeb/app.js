@@ -120,9 +120,15 @@ async function carregarDashboard() {
         const inscricaoEncontrada = dados.inscricoes.find(i => ((i.eventoId === ev.id) || (i.evento && i.evento.id === ev.id)) && i.status === 'ATIVA');
         const tr = document.createElement('tr');
         let botoesHTML = "";
+        const checkinEncontrado = dados.presencas.find(p => p.eventoId === ev.id);
 
         if (inscricaoEncontrada) {
-            botoesHTML = `<span style="color: green; font-weight: bold;">Inscrito</span>`;
+            botoesHTML = `<span style="color: green; font-weight: bold;">Inscrito </span>`;
+            if(checkinEncontrado) {
+                botoesHTML += `<span style="color: green; font-weight: bold;">e Check-in realizado!</span>`
+            } else {
+                botoesHTML += ` <button class="btn-checkin" onclick="checkin(${ev.id})">Check-in</button>`;
+            }
         } else {
             botoesHTML = `<button class="btn-acao" onclick="inscrever(${ev.id})">Inscrever-se</button>`;
             if (isAdmin) {
