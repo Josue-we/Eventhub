@@ -198,17 +198,32 @@ async function inscrever(eventoId) {
 }
 
 async function cancelarInscricao(inscricaoId) {
-    if(!confirm("Cancelar inscrição?")) return;
+    const inscricoes = JSON.parse(localStorage.getItem('cache_inscricoes') || '[]');
+    const presencas = JSON.parse(localStorage.getItem('cache_presencas') || '[]');
+    const inscricaoAlvo = inscricoes.find(i => i.id === inscricaoId);
+    if (inscricaoAlvo) {
+        const jaFezCheckin = presencas.some(p => p.eventoId === inscricaoAlvo.eventoId);
+        if (jaFezCheckin) {
+            alert("Operação Bloqueada!\n\nVocê já realizou o Check-in neste evento, por isso não pode mais cancelar a inscrição.");
+            return; // Para a função aqui, não deixa prosseguir
+        }
+    }
+    if(!confirm("Tem certeza que deseja cancelar sua inscrição?")) return;
     const token = localStorage.getItem('token');
     try {
         const res = await fetch(`${APIS.INSCRICOES}/${inscricaoId}`, {
-            method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+            method: 'DELETE', 
+            headers: { 'Authorization': 'Bearer ' + token }
         });
         if (res.ok) {
-            alert("Cancelado.");
+            alert("Inscrição cancelada com sucesso.");
             window.location.reload(); 
-        } else alert("Erro ao cancelar.");
-    } catch (e) { alert("Erro de conexão (Offline)."); }
+        } else {
+            alert("Erro ao cancelar. Tente novamente.");
+        }
+    } catch (e) { 
+        alert("Erro de conexão com o servidor."); 
+    }
 }
 
 async function checkin(eventoId) {
