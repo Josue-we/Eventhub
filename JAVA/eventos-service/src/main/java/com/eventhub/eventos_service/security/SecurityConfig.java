@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -30,7 +31,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Aqui definimos que TODAS as rotas de eventos precisam de login
+                // PERMITE LISTAR EVENTOS SEM LOGIN
+                .requestMatchers(HttpMethod.GET, "/eventos/**").permitAll()
+                // O resto exige login (criar evento, deletar, etc)
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new JwtTokenFilter(jwtValidationService), UsernamePasswordAuthenticationFilter.class);

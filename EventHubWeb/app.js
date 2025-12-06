@@ -32,18 +32,39 @@ function salvarSessao(token, email) {
     }
 }
 
+function getNomeEventoPorId(id) {
+    const eventos = JSON.parse(localStorage.getItem('cache_eventos') || '[]');
+    const evento = eventos.find(e => e.id === id);
+    return evento ? evento.nome : "evento";
+}
+
 function verificarAutenticacao() { if (!localStorage.getItem('token')) window.location.href = 'index.html'; }
 function logout() { localStorage.removeItem('token'); window.location.href = 'index.html'; }
 
 // --- FUNÇÃO DE E-MAIL ---
 async function enviarNotificacao(emailDestino, assunto, mensagem) {
+    const token = localStorage.getItem('token'); // Precisa disto para funcionar!
+    
     try {
-        await fetch(APIS.EMAILS, {
+        const resposta = await fetch(APIS.EMAILS, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token // O Token é obrigatório
+            },
             body: JSON.stringify({ to: emailDestino, subject: assunto, body: mensagem })
         });
-    } catch (erro) { console.error("Erro email:", erro); }
+
+        if (resposta.ok) {
+            console.log("E-MAIL ENVIADO COM SUCESSO!");
+        } else {
+            console.error("Erro no envio do e-mail. Status:", resposta.status);
+            const erroTexto = await resposta.text();
+            console.error("Detalhe:", erroTexto);
+        }
+    } catch (erro) { 
+        console.error("Erro de conexão no e-mail:", erro); 
+    }
 }
 
 // --- CORE: BUSCA DE DADOS (AGORA COM PRESENÇAS) ---
@@ -189,10 +210,38 @@ async function carregarMinhasInscricoes() {
 
 // --- AÇÕES ---
 async function inscrever(eventoId) {
-    const usuarioId = localStorage.getItem('usuarioId');
+    console.log("--- DEBUG: Início da Função Inscrever ---");
+
+    // --- CORREÇÃO AQUI: Recuperar o ID do usuário ---
+    const usuarioId = localStorage.getItem('usuarioId'); 
+    // ------------------------------------------------
+
+    // Verificação de segurança
+    if (!usuarioId) {
+        alert("Erro: ID do usuário não encontrado. Tente fazer login novamente.");
+        return;
+    }
+
+    const nomeEvento = getNomeEventoPorId(eventoId);
+    
+    // Agora a variável 'usuarioId' existe e pode ser usada aqui embaixo
     if(await processarAcao(APIS.INSCRICOES, { usuarioId, eventoId }, "Inscrição")) {
+        
+        console.log("Inscrição OK. Preparando e-mail...");
+        
         const email = localStorage.getItem('email');
-        enviarNotificacao(email, "Inscrição Confirmada", "Você foi inscrito no evento com sucesso!");
+        const assunto = `Confirmação: ${nomeEvento}`;
+        const mensagem = `Olá! Sua inscrição no evento "${nomeEvento}" foi confirmada com sucesso.`;
+        
+        console.log("Enviando e-mail para:", email); 
+
+        // Chama a função de e-mail (que já deve ter o Token, conforme ajustamos antes)
+        await enviarNotificacao(email, assunto, mensagem);
+        
+        console.log("Fluxo finalizado. Recarregando...");
+        
+        // Pode descomentar o reload agora se quiseres, 
+        // ou deixar comentado mais uma vez para ver os logs de sucesso
         window.location.reload(); 
     }
 }
@@ -200,37 +249,65 @@ async function inscrever(eventoId) {
 async function cancelarInscricao(inscricaoId) {
     const inscricoes = JSON.parse(localStorage.getItem('cache_inscricoes') || '[]');
     const presencas = JSON.parse(localStorage.getItem('cache_presencas') || '[]');
+    
+    // Busca a inscrição para saber qual é o evento
     const inscricaoAlvo = inscricoes.find(i => i.id === inscricaoId);
+    let nomeEvento = "evento";
+
     if (inscricaoAlvo) {
+        // Pega o nome do evento para usar no e-mail
+        nomeEvento = inscricaoAlvo.evento ? inscricaoAlvo.evento.nome : getNomeEventoPorId(inscricaoAlvo.eventoId);
+
         const jaFezCheckin = presencas.some(p => p.eventoId === inscricaoAlvo.eventoId);
         if (jaFezCheckin) {
             alert("Operação Bloqueada!\n\nVocê já realizou o Check-in neste evento, por isso não pode mais cancelar a inscrição.");
-            return; // Para a função aqui, não deixa prosseguir
+            return;
         }
     }
+
     if(!confirm("Tem certeza que deseja cancelar sua inscrição?")) return;
+    
     const token = localStorage.getItem('token');
+    
     try {
         const res = await fetch(`${APIS.INSCRICOES}/${inscricaoId}`, {
             method: 'DELETE', 
             headers: { 'Authorization': 'Bearer ' + token }
         });
+        
         if (res.ok) {
             alert("Inscrição cancelada com sucesso.");
+
+            // DISPARO DO E-MAIL DE CANCELAMENTO
+            const email = localStorage.getItem('email');
+            const assunto = `Cancelamento: ${nomeEvento}`;
+            const mensagem = `Sua inscrição no evento "${nomeEvento}" foi cancelada conforme solicitado.`;
+            
+            await enviarNotificacao(email, assunto, mensagem);
+
             window.location.reload(); 
         } else {
             alert("Erro ao cancelar. Tente novamente.");
         }
     } catch (e) { 
+        console.error(e);
         alert("Erro de conexão com o servidor."); 
     }
 }
 
 async function checkin(eventoId) {
     const usuarioId = localStorage.getItem('usuarioId');
+    const nomeEvento = getNomeEventoPorId(eventoId);
+
     if(await processarAcao(APIS.PRESENCAS, { usuarioId, eventoId }, "Check-in")) {
+        
         const email = localStorage.getItem('email');
-        enviarNotificacao(email, "Bem-vindo!", "Check-in registrado.");
+        const assunto = `Presença Confirmada: ${nomeEvento}`;
+        const mensagem = `Bem-vindo! Seu check-in no evento "${nomeEvento}" foi registrado. Aproveite!`;
+
+        // Aguarda o envio antes de recarregar
+        await enviarNotificacao(email, assunto, mensagem);
+        
         window.location.reload();
     }
 }
