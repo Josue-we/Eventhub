@@ -417,7 +417,7 @@ async function cadastrarECheckinVisitante(eventoId) {
 
         if (resPresenca.ok) {
             alert(`SUCESSO!\nVisitante cadastrado e check-in feito.\nSenha: 123456`);
-            enviarNotificacao(email, "Acesso EventHub", `Bem-vindo ${nome}! Senha: 123456`);
+            enviarNotificacao(email, "Acesso EventHub", `Bem-vindo ${nome}! \nSenha: 123456; \nFaça login para acompanhar seus eventos. Acesse: http://177.44.248.77`);
         }
     } catch (e) { alert("Erro: " + e.message); }
 }
