@@ -131,7 +131,7 @@ async function carregarDashboard() {
     
     const emailRaw = localStorage.getItem('email');
     const emailLogado = emailRaw ? emailRaw.trim().toLowerCase() : "";
-    const admins = ['admin@eventhub.com', 'staff@eventhub.com', 'josue@teste.com']; 
+    const admins = ['admin@eventhub.com', 'staff@eventhub.com', 'josue@teste.com', 'josue.weschenfelder@universo.univates.br']; 
     const isAdmin = admins.includes(emailLogado);
 
     const btnStaffGlobal = document.getElementById('btnStaff');
@@ -139,21 +139,23 @@ async function carregarDashboard() {
 
     dados.eventos.forEach(ev => {
         const inscricaoEncontrada = dados.inscricoes.find(i => ((i.eventoId === ev.id) || (i.evento && i.evento.id === ev.id)) && i.status === 'ATIVA');
+        const checkinEncontrado = dados.presencas.find(p => p.eventoId === ev.id);
         const tr = document.createElement('tr');
         let botoesHTML = "";
-        const checkinEncontrado = dados.presencas.find(p => p.eventoId === ev.id);
 
         if (inscricaoEncontrada) {
             botoesHTML = `<span style="color: green; font-weight: bold;">Inscrito </span>`;
             if(checkinEncontrado) {
-                botoesHTML += `<span style="color: green; font-weight: bold;">e Check-in realizado!</span>`
+                botoesHTML += `<span style="color: green; font-weight: bold;">e Check-in realizado!</span>`;
             } else {
                 botoesHTML += ` <button class="btn-checkin" onclick="checkin(${ev.id})">Check-in</button>`;
             }
         } else {
-            botoesHTML = `<button class="btn-acao" onclick="inscrever(${ev.id})">Inscrever-se</button>`;
+            if (!isAdmin) {
+                botoesHTML = `<button class="btn-acao" onclick="inscrever(${ev.id})">Inscrever-se</button>`;
+            }
             if (isAdmin) {
-                botoesHTML += ` <button style="background-color: #e83e8c; margin-left: 5px;" onclick="cadastrarECheckinVisitante(${ev.id})">Visitante</button>`;
+                botoesHTML += `<button style="background-color: #e83e8c;" onclick="cadastrarECheckinVisitante(${ev.id})">Visitante</button>`;
             }
         }
         tr.innerHTML = `<td><strong>${ev.nome}</strong></td><td>${ev.descricao}</td><td>${ev.local}</td><td>${botoesHTML}</td>`;
@@ -386,40 +388,117 @@ function gerarPDF(nome, evento, data, codigo) {
 
 // --- FLUXO VISITANTE ---
 async function cadastrarECheckinVisitante(eventoId) {
-    const nome = prompt("Nome:"); if (!nome) return;
-    const email = prompt("E-mail:"); if (!email) return;
-    const senha = "123456";
+    console.log("--- INICIANDO FLUXO DE VISITANTE ---");
+    
+    const nomeInput = prompt("Nome do Visitante:"); 
+    if (!nomeInput) return;
+    const email = prompt("E-mail do Visitante:"); 
+    if (!email) return;
+    
+    // Vamos usar o token do ADMIN para fazer as operações, 
+    // assim não dependemos da senha do visitante.
+    const tokenAdmin = localStorage.getItem('token'); 
+    
     try {
+        // Teste de conexão
+        if (!navigator.onLine) throw new Error("Offline");
+
+        let usuarioId = null;
+        let nomeReal = nomeInput;
+
+        // 1. TENTA CRIAR O USUÁRIO
+        const senhaPadrao = "123456";
         const resCriar = await fetch(APIS.USUARIOS, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome, email, senha })
-        });
-        if (!resCriar.ok && resCriar.status !== 400) throw new Error("Erro cadastro");
-
-        const resAuth = await fetch(APIS.AUTH, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, senha })
-        });
-        if (!resAuth.ok) throw new Error("Erro auth");
-        
-        const tokenVisitante = (await resAuth.json()).token;
-        const idVisitante = lerIdDoToken(tokenVisitante);
-
-        await fetch(APIS.INSCRICOES, {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenVisitante },
-            body: JSON.stringify({ usuarioId: idVisitante, eventoId })
+            body: JSON.stringify({ nome: nomeInput, email, senha: senhaPadrao })
         });
 
-        const resPresenca = await fetch(APIS.PRESENCAS, {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenVisitante },
-            body: JSON.stringify({ usuarioId: idVisitante, eventoId })
-        });
-
-        if (resPresenca.ok) {
-            alert(`SUCESSO!\nVisitante cadastrado e check-in feito.\nSenha: 123456`);
-            enviarNotificacao(email, "Acesso EventHub", `Bem-vindo ${nome}! \nSenha: 123456; \nFaça login para acompanhar seus eventos. Acesse: http://177.44.248.77`);
+        if (resCriar.ok) {
+            // CENÁRIO A: Usuário Novo Criado
+            console.log("Usuário novo criado com sucesso.");
+            // Tenta pegar o ID da resposta (se o backend retornar o objeto criado)
+            try {
+                const usuarioNovo = await resCriar.json();
+                if(usuarioNovo && usuarioNovo.id) usuarioId = usuarioNovo.id;
+            } catch(e) {} // Se não retornar JSON, seguimos para a busca
+        } else {
+            // CENÁRIO B: Erro na criação (Provavelmente já existe)
+            console.log("Usuário não criado (Status " + resCriar.status + "). Verificando se já existe...");
         }
-    } catch (e) { alert("Erro: " + e.message); }
+
+        // 2. SE NÃO TEMOS O ID (Porque já existia ou a criação não retornou ID)
+        // Vamos buscar o usuário pelo e-mail para pegar o ID dele
+        if (!usuarioId) {
+            const resBusca = await fetch(APIS.USUARIOS, {
+                headers: { 'Authorization': 'Bearer ' + tokenAdmin }
+            });
+            
+            if (resBusca.ok) {
+                const listaUsuarios = await resBusca.json();
+                const usuarioEncontrado = listaUsuarios.find(u => u.email.toLowerCase() === email.toLowerCase());
+                
+                if (usuarioEncontrado) {
+                    usuarioId = usuarioEncontrado.id;
+                    nomeReal = usuarioEncontrado.nome; // Usamos o nome real do cadastro
+                    console.log("Usuário existente encontrado. ID:", usuarioId);
+                }
+            }
+        }
+
+        if (!usuarioId) {
+            // Se chegou aqui e não temos ID, é um erro real (não é internet)
+            throw new Error("Erro Crítico: Não foi possível criar nem encontrar o usuário.");
+        }
+
+        // 3. REALIZAR INSCRIÇÃO (Usando Token do Admin)
+        // Ignoramos erro aqui (pode já estar inscrito)
+        await fetch(APIS.INSCRICOES, {
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenAdmin },
+            body: JSON.stringify({ usuarioId, eventoId })
+        });
+
+        // 4. REALIZAR CHECK-IN (Usando Token do Admin)
+        const resPresenca = await fetch(APIS.PRESENCAS, {
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenAdmin },
+            body: JSON.stringify({ usuarioId, eventoId })
+        });
+
+        if (resPresenca.ok || resPresenca.status === 400 || resPresenca.status === 409) {
+            // 5. ENVIAR E-MAIL
+            const nomeEvento = getNomeEventoPorId(eventoId);
+            const assunto = `Acesso EventHub: ${nomeEvento}`;
+            const mensagem = `Olá ${nomeReal}! Sua presença foi registrada no evento "${nomeEvento}".`;
+            
+            await enviarNotificacao(email, assunto, mensagem);
+
+            alert(`SUCESSO!\n\nVisitante: ${nomeReal}\nSituação: Check-in Realizado com Sucesso!`);
+            window.location.reload();
+        } else {
+            throw new Error("Falha ao registrar presença.");
+        }
+
+    } catch (erro) {
+        // --- TRATAMENTO DE ERRO / OFFLINE ---
+        console.warn("Erro no processo:", erro);
+        const msg = erro.message || "";
+
+        // Se for erro de internet, salva na fila
+        if (msg === "Offline" || msg.includes("NetworkError") || msg.includes("Failed to fetch")) {
+            console.warn("Sem conexão. Salvando visitante na fila...");
+            salvarNaFila('VISITANTE_OFFLINE', 'SPECIAL', { 
+                nome: nomeInput, 
+                email: email, 
+                eventoId: eventoId 
+            });
+            alert(`Sem internet.\n\nO visitante "${nomeInput}" foi salvo na fila e será sincronizado depois.`);
+            verificarPendencias();
+        } else {
+            // Se for outro erro (ex: erro de servidor), mostra alerta e NÃO salva
+            alert(`Erro: ${msg.replace("Error:", "")}`);
+        }
+    }
 }
 
 async function processarAcao(url, corpo, tipo) {
@@ -459,28 +538,92 @@ function verificarPendencias() {
 async function sincronizar() {
     const fila = JSON.parse(localStorage.getItem('fila_sync') || '[]');
     if(fila.length === 0) return;
-    if(!confirm("Sincronizar?")) return;
     
-    if(localStorage.getItem('token') === 'TOKEN_OFFLINE') { alert("Faça login online."); return; }
+    if(!confirm(`Existem ${fila.length} ações pendentes. Sincronizar agora?`)) return;
+    
+    // Verifica se estamos realmente online antes de tentar
+    try {
+        await fetch(APIS.EVENTOS, { method: 'HEAD' }); 
+    } catch(e) {
+        alert("Ainda sem conexão com o servidor. Tente mais tarde.");
+        return;
+    }
 
-    const token = localStorage.getItem('token');
+    const tokenAdm = localStorage.getItem('token');
     const novaFila = [];
     let sucessos = 0;
 
+    // Loop processando item a item
     for (const item of fila) {
         try {
-            const res = await fetch(item.url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify(item.corpo)
-            });
-            if(res.ok || res.status === 400 || res.status === 409) sucessos++;
-            else novaFila.push(item);
-        } catch (e) { novaFila.push(item); }
+            if (item.tipo === 'VISITANTE_OFFLINE') {
+                // --- PROCESSAMENTO ESPECIAL PARA VISITANTES ---
+                // Reutilizamos a lógica chamando a função original mas forçando o modo online
+                // (Como o navegador agora tem internet, ele vai executar o bloco try da função acima)
+                // Nota: Precisamos de uma pequena adaptação ou recriar a lógica aqui. 
+                // Para simplificar, vou recriar a lógica "silenciosa" aqui:
+                
+                const { nome, email, eventoId } = item.corpo;
+                const senha = "123456";
+
+                // 1. Criar/Verificar Usuário
+                await fetch(APIS.USUARIOS, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, email, senha })
+                });
+
+                // 2. Pegar Token do Visitante
+                const resAuth = await fetch(APIS.AUTH, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+                if(!resAuth.ok) throw new Error("Falha Auth Visitante Sync");
+                
+                const tokenVis = (await resAuth.json()).token;
+                const idVis = lerIdDoToken(tokenVis);
+
+                // 3. Inscrição e Check-in
+                await fetch(APIS.INSCRICOES, {
+                    method: 'POST', headers: { 'Authorization': 'Bearer ' + tokenVis, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuarioId: idVis, eventoId })
+                });
+                
+                const resCheck = await fetch(APIS.PRESENCAS, {
+                    method: 'POST', headers: { 'Authorization': 'Bearer ' + tokenVis, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuarioId: idVis, eventoId })
+                });
+                
+                if(resCheck.ok) {
+                    sucessos++;
+                    // Envia e-mail silenciosamente
+                    const nomeEvento = getNomeEventoPorId(eventoId);
+                    enviarNotificacao(email, `Acesso Confirmado: ${nomeEvento}`, `Check-in realizado via plataforma.`);
+                } else {
+                    novaFila.push(item); // Falhou, mantém na fila
+                }
+
+            } else {
+                // --- PROCESSAMENTO PADRÃO (Inscrição/Check-in normal) ---
+                const res = await fetch(item.url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenAdm },
+                    body: JSON.stringify(item.corpo)
+                });
+                
+                if(res.ok || res.status === 400 || res.status === 409) {
+                    sucessos++;
+                } else {
+                    novaFila.push(item);
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao sincronizar item:", item, e);
+            novaFila.push(item); // Devolve para a fila se der erro
+        }
     }
     
     localStorage.setItem('fila_sync', JSON.stringify(novaFila));
-    alert(`Sincronizados: ${sucessos}`);
+    alert(`Sincronização concluída!\nSucessos: ${sucessos}\nPendentes: ${novaFila.length}`);
     verificarPendencias();
     window.location.reload();
 }
