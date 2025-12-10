@@ -576,69 +576,79 @@ async function sincronizar() {
     
     if(!confirm(`Existem ${fila.length} ações pendentes. Sincronizar agora?`)) return;
     
-    // Verifica se estamos realmente online antes de tentar
-    try {
-        await fetch(APIS.EVENTOS, { method: 'HEAD' }); 
-    } catch(e) {
-        alert("Ainda sem conexão com o servidor. Tente mais tarde.");
-        return;
-    }
+    // Teste de conexão real antes de começar
+    try { await fetch(APIS.EVENTOS, { method: 'HEAD' }); } 
+    catch(e) { alert("Ainda sem conexão. Tente mais tarde."); return; }
 
     const tokenAdm = localStorage.getItem('token');
     const novaFila = [];
     let sucessos = 0;
 
-    // Loop processando item a item
     for (const item of fila) {
         try {
             if (item.tipo === 'VISITANTE_OFFLINE') {
-                // --- PROCESSAMENTO ESPECIAL PARA VISITANTES ---
-                // Reutilizamos a lógica chamando a função original mas forçando o modo online
-                // (Como o navegador agora tem internet, ele vai executar o bloco try da função acima)
-                // Nota: Precisamos de uma pequena adaptação ou recriar a lógica aqui. 
-                // Para simplificar, vou recriar a lógica "silenciosa" aqui:
+                // --- LÓGICA ESPECIAL PARA ADMIN/VISITANTE ---
                 
-                const { nome, email, eventoId } = item.corpo;
+                // 1. Ler qual foi a ação solicitada ('INSCRICAO', 'CHECKIN' ou 'TUDO')
+                const { nome, email, eventoId, tipoAcao } = item.corpo;
+                const acao = tipoAcao || 'TUDO'; // Fallback para compatibilidade
                 const senha = "123456";
 
-                // 1. Criar/Verificar Usuário
+                // 2. Garantir que o usuário existe (Cria ou Busca)
+                // Precisamos do token dele para as operações
                 await fetch(APIS.USUARIOS, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nome, email, senha })
                 });
 
-                // 2. Pegar Token do Visitante
                 const resAuth = await fetch(APIS.AUTH, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, senha })
                 });
-                if(!resAuth.ok) throw new Error("Falha Auth Visitante Sync");
                 
-                const tokenVis = (await resAuth.json()).token;
-                const idVis = lerIdDoToken(tokenVis);
+                if(!resAuth.ok) throw new Error("Falha ao autenticar usuário na sync");
+                const tokenUser = (await resAuth.json()).token;
+                const idUser = lerIdDoToken(tokenUser);
 
-                // 3. Inscrição e Check-in
-                await fetch(APIS.INSCRICOES, {
-                    method: 'POST', headers: { 'Authorization': 'Bearer ' + tokenVis, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usuarioId: idVis, eventoId })
-                });
-                
-                const resCheck = await fetch(APIS.PRESENCAS, {
-                    method: 'POST', headers: { 'Authorization': 'Bearer ' + tokenVis, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usuarioId: idVis, eventoId })
-                });
-                
-                if(resCheck.ok) {
+                // 3. Executar APENAS o que foi pedido
+                let operacaoOk = true;
+
+                // -> Passo A: Inscrição (Se for 'INSCRICAO' ou 'TUDO')
+                if (acao === 'INSCRICAO' || acao === 'TUDO') {
+                    const resIns = await fetch(APIS.INSCRICOES, {
+                        method: 'POST', 
+                        headers: { 'Authorization': 'Bearer ' + tokenUser, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ usuarioId: idUser, eventoId })
+                    });
+                    if (!resIns.ok && resIns.status !== 409) operacaoOk = false;
+                }
+
+                // -> Passo B: Check-in (Se for 'CHECKIN' ou 'TUDO')
+                if (operacaoOk && (acao === 'CHECKIN' || acao === 'TUDO')) {
+                    const resCheck = await fetch(APIS.PRESENCAS, {
+                        method: 'POST', 
+                        headers: { 'Authorization': 'Bearer ' + tokenUser, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ usuarioId: idUser, eventoId })
+                    });
+                    if (!resCheck.ok && resCheck.status !== 409) operacaoOk = false;
+                }
+
+                if(operacaoOk) {
                     sucessos++;
-                    // Envia e-mail silenciosamente
+                    // Envia e-mail
                     const nomeEvento = getNomeEventoPorId(eventoId);
-                    enviarNotificacao(email, `Acesso Confirmado: ${nomeEvento}`, `Check-in realizado via plataforma.`);
+                    // Personaliza a mensagem do e-mail baseada na ação
+                    let msgEmail = "Ação realizada via Sincronização.";
+                    if (acao === 'INSCRICAO') msgEmail = "Sua inscrição foi confirmada.";
+                    if (acao === 'CHECKIN') msgEmail = "Seu check-in foi registrado.";
+                    
+                    enviarNotificacao(email, `Atualização: ${nomeEvento}`, msgEmail);
                 } else {
-                    novaFila.push(item); // Falhou, mantém na fila
+                    novaFila.push(item); // Falhou alguma etapa, mantém na fila
                 }
 
             } else {
-                // --- PROCESSAMENTO PADRÃO (Inscrição/Check-in normal) ---
+                // --- LÓGICA PADRÃO (Inscrição/Check-in simples do usuário logado) ---
                 const res = await fetch(item.url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenAdm },
@@ -653,7 +663,7 @@ async function sincronizar() {
             }
         } catch (e) {
             console.error("Erro ao sincronizar item:", item, e);
-            novaFila.push(item); // Devolve para a fila se der erro
+            novaFila.push(item);
         }
     }
     
