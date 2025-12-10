@@ -268,7 +268,7 @@ async function inscrever(eventoId) {
         
         const email = localStorage.getItem('email');
         const assunto = `Confirmação: ${nomeEvento}`;
-        const mensagem = `Olá! Sua inscrição no evento "${nomeEvento}" foi confirmada com sucesso.`;
+        const mensagem = `Olá! Sua inscrição no evento "${nomeEvento}" foi confirmada com sucesso.\nAcesse nossa plataforma para mais informações: http://177.44.248.77`;
         
         console.log("Enviando e-mail para:", email); 
 
@@ -318,7 +318,7 @@ async function cancelarInscricao(inscricaoId) {
             // DISPARO DO E-MAIL DE CANCELAMENTO
             const email = localStorage.getItem('email');
             const assunto = `Cancelamento: ${nomeEvento}`;
-            const mensagem = `Sua inscrição no evento "${nomeEvento}" foi cancelada conforme solicitado.`;
+            const mensagem = `Sua inscrição no evento "${nomeEvento}" foi cancelada conforme solicitado.\nAcesse nossa plataforma para mais informações: http://177.44.248.77`;
             
             await enviarNotificacao(email, assunto, mensagem);
 
@@ -340,7 +340,7 @@ async function checkin(eventoId) {
         
         const email = localStorage.getItem('email');
         const assunto = `Presença Confirmada: ${nomeEvento}`;
-        const mensagem = `Bem-vindo! Seu check-in no evento "${nomeEvento}" foi registrado. Aproveite!`;
+        const mensagem = `Bem-vindo! Seu check-in no evento "${nomeEvento}" foi registrado. Aproveite!\nAcesse nossa plataforma para mais informações: http://177.44.248.77`;
 
         // Aguarda o envio antes de recarregar
         await enviarNotificacao(email, assunto, mensagem);
@@ -639,8 +639,8 @@ async function sincronizar() {
                     const nomeEvento = getNomeEventoPorId(eventoId);
                     // Personaliza a mensagem do e-mail baseada na ação
                     let msgEmail = "Ação realizada via Sincronização.";
-                    if (acao === 'INSCRICAO') msgEmail = "Sua inscrição foi confirmada.";
-                    if (acao === 'CHECKIN') msgEmail = "Seu check-in foi registrado.";
+                    if (acao === 'INSCRICAO') msgEmail = "Sua inscrição foi confirmada.\nAcesse nossa plataforma para mais informações: http://177.44.248.77";
+                    if (acao === 'CHECKIN') msgEmail = "Seu check-in foi registrado.\nAcesse nossa plataforma para mais informações: http://177.44.248.77";
                     
                     enviarNotificacao(email, `Atualização: ${nomeEvento}`, msgEmail);
                 } else {
