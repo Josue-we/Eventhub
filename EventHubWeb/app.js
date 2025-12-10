@@ -39,7 +39,12 @@ function getNomeEventoPorId(id) {
 }
 
 function verificarAutenticacao() { if (!localStorage.getItem('token')) window.location.href = 'index.html'; }
-function logout() { localStorage.removeItem('token'); window.location.href = 'index.html'; }
+function logout() { 
+    localStorage.removeItem('token'); 
+    localStorage.removeItem('email');
+    localStorage.removeItem('usuarioId');
+    window.location.href = 'index.html'; 
+}
 
 // --- FUNÇÃO DE E-MAIL ---
 async function enviarNotificacao(emailDestino, assunto, mensagem) {
@@ -129,35 +134,65 @@ async function carregarDashboard() {
     if (!tbody) return;
     tbody.innerHTML = "";
     
+    // Configuração de Admin
     const emailRaw = localStorage.getItem('email');
     const emailLogado = emailRaw ? emailRaw.trim().toLowerCase() : "";
-    const admins = ['admin@eventhub.com', 'staff@eventhub.com', 'josue@teste.com', 'josue.weschenfelder@universo.univates.br']; 
+    const admins = ['admin@eventhub.com', 'staff@eventhub.com', 'josue@teste.com']; 
     const isAdmin = admins.includes(emailLogado);
 
+    // Botão Global de Staff (Cabeçalho)
     const btnStaffGlobal = document.getElementById('btnStaff');
     if(btnStaffGlobal) btnStaffGlobal.style.display = isAdmin ? 'inline-block' : 'none';
 
     dados.eventos.forEach(ev => {
+        // Busca se o usuário logado tem inscrição/presença neste evento
+        // Nota: O '.find' procura nas inscrições DO USUÁRIO LOGADO (filtradas no buscarDados)
         const inscricaoEncontrada = dados.inscricoes.find(i => ((i.eventoId === ev.id) || (i.evento && i.evento.id === ev.id)) && i.status === 'ATIVA');
         const checkinEncontrado = dados.presencas.find(p => p.eventoId === ev.id);
+        
         const tr = document.createElement('tr');
         let botoesHTML = "";
 
-        if (inscricaoEncontrada) {
-            botoesHTML = `<span style="color: green; font-weight: bold;">Inscrito </span>`;
-            if(checkinEncontrado) {
-                botoesHTML += `<span style="color: green; font-weight: bold;">e Check-in realizado!</span>`;
-            } else {
-                botoesHTML += ` <button class="btn-checkin" onclick="checkin(${ev.id})">Check-in</button>`;
-            }
+        // --- DIVISÃO CLARA DE PERFIS ---
+
+        if (isAdmin) {
+            // ====================================================
+            // PERFIL 1: ADMIN / STAFF
+            // O Admin vê SEMPRE as ferramentas de gestão, independente de estar inscrito
+            // ====================================================
+            
+            const styleBtn = "padding: 5px 10px; margin-right: 5px; font-size: 12px; border: none; border-radius: 4px; color: white; cursor: pointer;";
+            
+            // Botão A: Apenas Inscrever (Azul)
+            botoesHTML += `<button style="${styleBtn} background-color: #17a2b8;" onclick="executarAcaoAdmin(${ev.id}, 'INSCRICAO')" title="Apenas inscreve o usuário">Só Inscrever</button>`;
+
+            // Botão B: Apenas Check-in (Verde Escuro)
+            botoesHTML += `<button style="${styleBtn} background-color: #28a745;" onclick="executarAcaoAdmin(${ev.id}, 'CHECKIN')" title="Para quem já se inscreveu antes">Só Check-in</button>`;
+
+            // Botão C: Combo Completo (Roxo)
+            botoesHTML += `<button style="${styleBtn} background-color: #6f42c1;" onclick="executarAcaoAdmin(${ev.id}, 'TUDO')" title="Cadastra, inscreve e faz check-in">Completo</button>`;
+
         } else {
-            if (!isAdmin) {
+            // ====================================================
+            // PERFIL 2: USUÁRIO COMUM (Visitante/Aluno)
+            // Vê apenas o seu próprio status
+            // ====================================================
+
+            if (inscricaoEncontrada) {
+                // Cenário: JÁ INSCRITO
+                botoesHTML = `<span style="color: green; font-weight: bold;">Inscrito </span>`;
+                
+                if (checkinEncontrado) {
+                    botoesHTML += `<span style="color: green; font-weight: bold;">e Check-in feito!</span>`;
+                } else {
+                    botoesHTML += ` <button class="btn-checkin" onclick="checkin(${ev.id})">Check-in</button>`;
+                }
+            } else {
+                // Cenário: NÃO INSCRITO
                 botoesHTML = `<button class="btn-acao" onclick="inscrever(${ev.id})">Inscrever-se</button>`;
             }
-            if (isAdmin) {
-                botoesHTML += `<button style="background-color: #e83e8c;" onclick="cadastrarECheckinVisitante(${ev.id})">Visitante</button>`;
-            }
         }
+        
         tr.innerHTML = `<td><strong>${ev.nome}</strong></td><td>${ev.descricao}</td><td>${ev.local}</td><td>${botoesHTML}</td>`;
         tbody.appendChild(tr);
     });
@@ -744,4 +779,128 @@ async function confirmarAlteracaoSenha() {
         alert("Erro técnico: " + erro.message);
     }
     fecharModalSenha();
+}
+
+/**
+ * Função Mestra para Admins
+ * @param {number} eventoId - ID do evento
+ * @param {string} tipoAcao - 'INSCRICAO', 'CHECKIN' ou 'TUDO'
+ */
+async function executarAcaoAdmin(eventoId, tipoAcao) {
+    // Texto para o prompt ficar claro
+    let textoAcao = "Ação Admin";
+    if (tipoAcao === 'INSCRICAO') textoAcao = "Realizar APENAS Inscrição";
+    if (tipoAcao === 'CHECKIN') textoAcao = "Realizar APENAS Check-in";
+    if (tipoAcao === 'TUDO') textoAcao = "Cadastro Completo (Inscrição + Check-in)";
+
+    console.log(`--- INICIANDO ${tipoAcao} ---`);
+    
+    const nomeInput = prompt(`${textoAcao}\n\nNome do Usuário:`); 
+    if (!nomeInput) return;
+    const email = prompt(`${textoAcao}\n\nE-mail do Usuário:`); 
+    if (!email) return;
+
+    const tokenAdmin = localStorage.getItem('token'); 
+    
+    try {
+        if (!navigator.onLine) throw new Error("Offline");
+
+        let usuarioId = null;
+        let nomeReal = nomeInput;
+        let isNovoUsuario = false; // <--- O SEGREDO PARA A SENHA
+
+        // 1. TENTA CRIAR O USUÁRIO
+        const senhaPadrao = "123456";
+        const resCriar = await fetch(APIS.USUARIOS, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome: nomeInput, email, senha: senhaPadrao })
+        });
+
+        if (resCriar.ok) {
+            console.log("Usuário NOVO criado.");
+            isNovoUsuario = true; // Marcar que acabamos de criar
+            try {
+                const usuarioNovo = await resCriar.json();
+                if(usuarioNovo && usuarioNovo.id) usuarioId = usuarioNovo.id;
+            } catch(e) {}
+        } else {
+            console.log("Usuário já existe ou erro na criação. Buscando ID...");
+        }
+
+        // 2. BUSCAR ID SE NECESSÁRIO
+        if (!usuarioId) {
+            const resBusca = await fetch(APIS.USUARIOS, {
+                headers: { 'Authorization': 'Bearer ' + tokenAdmin }
+            });
+            if (resBusca.ok) {
+                const lista = await resBusca.json();
+                const encontrado = lista.find(u => u.email.toLowerCase() === email.toLowerCase());
+                if (encontrado) {
+                    usuarioId = encontrado.id;
+                    nomeReal = encontrado.nome;
+                }
+            }
+        }
+
+        if (!usuarioId) throw new Error("Não foi possível identificar o usuário (falha criar e buscar).");
+
+        // 3. EXECUTAR AS AÇÕES COM BASE NO BOTÃO CLICADO
+        let mensagensSucesso = [];
+
+        // Ação: INSCRIÇÃO (Executa se for 'INSCRICAO' ou 'TUDO')
+        if (tipoAcao === 'INSCRICAO' || tipoAcao === 'TUDO') {
+            const resIns = await fetch(APIS.INSCRICOES, {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenAdmin },
+                body: JSON.stringify({ usuarioId, eventoId })
+            });
+            if (resIns.ok || resIns.status === 409) mensagensSucesso.push("Inscrição");
+            else throw new Error("Falha na Inscrição");
+        }
+
+        // Ação: CHECK-IN (Executa se for 'CHECKIN' ou 'TUDO')
+        if (tipoAcao === 'CHECKIN' || tipoAcao === 'TUDO') {
+            const resPres = await fetch(APIS.PRESENCAS, {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenAdmin },
+                body: JSON.stringify({ usuarioId, eventoId })
+            });
+            if (resPres.ok || resPres.status === 409) mensagensSucesso.push("Check-in");
+            else throw new Error("Falha no Check-in (verifique se o usuário estava inscrito)");
+        }
+
+        // 4. ENVIO DE E-MAIL E MENSAGEM FINAL
+        const nomeEvento = getNomeEventoPorId(eventoId);
+        
+        // Dispara e-mail (Opcional: podes personalizar o texto baseado no tipoAcao também)
+        enviarNotificacao(email, `Atualização: ${nomeEvento}`, `Olá ${nomeReal}! Ação realizada: ${mensagensSucesso.join(' e ')}.`);
+
+        // --- MONTAGEM DA MENSAGEM FINAL PARA O ADMIN ---
+        let msgFinal = `SUCESSO!\n\nUsuário: ${nomeReal}\nAções: ${mensagensSucesso.join(' + ')}`;
+
+        if (isNovoUsuario) {
+            // AQUI ESTÁ O QUE PEDISTE: MOSTRAR A SENHA
+            msgFinal += `\n\nNOVO USUÁRIO CADASTRADO\nInforme ao visitante:\nLogin: ${email}\nSenha: ${senhaPadrao}`;
+        } else {
+            msgFinal += `\n\n(Usuário já existia na base de dados)`;
+        }
+
+        alert(msgFinal);
+        window.location.reload();
+
+    } catch (erro) {
+        // TRATAMENTO OFFLINE IGUAL AO ANTERIOR
+        console.warn("Erro:", erro);
+        const msg = erro.message || "";
+
+        if (msg === "Offline" || msg.includes("NetworkError") || msg.includes("Failed to fetch")) {
+            salvarNaFila('VISITANTE_OFFLINE', 'SPECIAL', { 
+                nome: nomeInput, email: email, eventoId: eventoId, tipoAcao: tipoAcao // Salvamos o tipo também!
+            });
+            alert(`Sem internet.\nA ação para "${nomeInput}" foi salva na fila.`);
+            verificarPendencias();
+        } else {
+            alert(`Erro: ${msg.replace("Error:", "")}`);
+        }
+    }
 }
